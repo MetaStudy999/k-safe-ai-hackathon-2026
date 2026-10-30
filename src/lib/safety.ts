@@ -1,6 +1,6 @@
 export type Situation = "before_transfer" | "already_transferred" | "installed_app" | "unsure";
 export type RiskLevel = "warning" | "review" | "no_clear_signal";
-export type SignalId = "upfront_payment" | "unverified_app_install" | "urgent_pressure" | "impersonation" | "family_contact_scam" | "gift_card_pin_request" | "urgent_transfer_request" | "delivery_redirection" | "invitation_link" | "payment_cancel_verification" | "customs_payment_link";
+export type SignalId = "upfront_payment" | "unverified_app_install" | "urgent_pressure" | "impersonation" | "family_contact_scam" | "gift_card_pin_request" | "urgent_transfer_request" | "delivery_redirection" | "invitation_link" | "payment_cancel_verification" | "customs_payment_link" | "delivery_address_redirect" | "secret_investigation_chat" | "benefit_personal_data" | "changed_payment_account" | "remote_support_install" | "marketplace_external_payment" | "bank_secret_request" | "redelivery_fee";
 export type AnalysisResult = {
   risk_level: RiskLevel;
   signals: SignalId[];
@@ -45,7 +45,15 @@ const signalRules: { id: SignalId; reason: string; pattern: RegExp }[] = [
   { id: "delivery_redirection", reason: "배송지 오류를 내세워 별도 링크에서 수정을 유도합니다. 공식 택배사 경로로 확인하세요.", pattern: /(?:택배|배송지|배송).{0,70}(?:잘못|오류|틀렸|수정|변경).{0,80}(?:링크|주소|페이지|확인)/i },
   { id: "invitation_link", reason: "청첩장·초대장 링크 열람을 유도합니다. 발신자에게 기존 연락 수단으로 확인하세요.", pattern: /(?:모바일\s*)?(?:청첩장|결혼식\s*초대장).{0,90}(?:링크|주소|URL|접속|클릭)/i },
   { id: "payment_cancel_verification", reason: "카드 결제 승인 이후 별도 취소·본인확인 페이지로 이동을 유도합니다.", pattern: /(?:카드|결제).{0,45}(?:결제|승인).{0,90}(?:결제\s*취소|취소\s*페이지|본인\s*확인|인증)/i },
-  { id: "customs_payment_link", reason: "관세·통관 미납을 내세워 조회 링크나 결제를 유도합니다.", pattern: /(?:관세|통관).{0,50}(?:미납|납부|결제).{0,85}(?:배송\s*조회|링크|페이지|결제|납부)/i }
+  { id: "customs_payment_link", reason: "관세·통관 미납을 내세워 조회 링크나 결제를 유도합니다.", pattern: /(?:관세|통관).{0,50}(?:미납|납부|결제).{0,85}(?:배송\s*조회|링크|페이지|결제|납부)/i },
+  { id: "delivery_address_redirect", reason: "배송·수취지 확인을 빌미로 별도 주소 접속을 요청합니다.", pattern: /(?:택배|배송|수취지|수령지).{0,110}(?:확인|보류|변경|주소|접속|입력).{0,70}(?:주소|링크|접속|확인|입력).{0,40}(?:접속|입력|해\s*주세요|하세요)/i },
+  { id: "secret_investigation_chat", reason: "수사기관을 내세우며 비밀 유지를 요구하고 별도 채팅 참여를 유도합니다.", pattern: /(?:수사관|경찰|검찰|수사기관).{0,90}(?:비밀|말하지|알리지|공개하지).{0,70}(?:채팅방|대화방|오픈채팅|들어오세요|참여)/i },
+  { id: "benefit_personal_data", reason: "지원금을 내세워 별도 화면에서 개인정보·인증을 요구합니다.", pattern: /(?:지원금|보조금|환급금|지급\s*대상|대상자).{0,100}(?:주민정보|개인정보|신분증|주민번호|인증).{0,80}(?:화면|페이지|입력|신청|제출|인증)/i },
+  { id: "changed_payment_account", reason: "거래처 계좌가 변경됐다며 결제 계좌 확인을 유도합니다. 기존 공식 경로로 확인하세요.", pattern: /(?:거래처|청구서|대금|회계팀|납품).{0,100}(?:변경된|새로운|바뀐|새\s*계좌|계좌\s*변경).{0,60}(?:계좌|통장|입금|송금|이체|대금)/i },
+  { id: "remote_support_install", reason: "고객센터 지원을 빌미로 원격제어 프로그램을 설치하도록 유도합니다.", pattern: /(?:고객센터|상담원|기술지원|지원팀|점검).{0,100}(?:원격제어|원격\s*지원|원격접속).{0,70}(?:앱|프로그램|설치|내려받|다운로드)/i },
+  { id: "marketplace_external_payment", reason: "거래를 빌미로 별도 인증 페이지에 카드·계좌 정보를 요구합니다.", pattern: /(?:중고|판매자|안전결제|직거래).{0,110}(?:인증|확인|결제).{0,50}(?:페이지|사이트|화면).{0,70}(?:카드|계좌|비밀번호).{0,50}(?:정보|번호|입력)/i },
+  { id: "bank_secret_request", reason: "은행을 내세워 전화 등으로 비밀번호·인증번호를 전달하도록 요구합니다.", pattern: /(?:은행|금융회사|카드사).{0,130}(?:전화|연락처|상담|안내).{0,80}(?:비밀번호|인증번호|OTP|암호).{0,40}(?:말하세요|알려|전달|입력|공유)/i },
+  { id: "redelivery_fee", reason: "택배 재배송을 위해 별도의 비용 결제·납부를 요청합니다.", pattern: /(?:택배|배송|재배송|반송).{0,120}(?:재배송|배송비|비용|수수료|결제창).{0,70}(?:납부|결제|입금|송금)/i }
 ];
 
 export function getActions(situation: Situation, signals: SignalId[] = []): string[] {
@@ -77,8 +85,15 @@ export function getActions(situation: Situation, signals: SignalId[] = []): stri
   ];
 }
 
+// Meta text (training, documentation, analysis) is not a direct payment request.
+// Keep warnings when a clear instruction to provide credentials, money or access exists.
+// These heuristics cannot reliably understand context; do not infer that a non-match is safe.
+const metaDiscussion = /(?:교육|강의|수업|발표|디자인|설명|분석|예시|사례|자료|안내서|연구)/i;
+const directAction = /(?:입력(?:해|하)|보내(?:주|달라|세요)|전달(?:해|하세요)|송금(?:해|하)|이체(?:해|하)|입금(?:해|하)|클릭(?:해|하)|접속(?:해|하)|설치(?:해|하)|납부(?:해|하)|말(?:해|하)세요|알려(?:주세요|주십시오)|다운로드(?:해|하)|제출(?:해|하)|신청(?:해|하))/i;
+
 export function analyzeMessage(message: string, situation: Situation): AnalysisResult {
-  const matches = signalRules.filter((rule) => rule.pattern.test(message));
+  const isNonActionableDiscussion = metaDiscussion.test(message) && !directAction.test(message);
+  const matches = isNonActionableDiscussion ? [] : signalRules.filter((rule) => rule.pattern.test(message));
   const signals = matches.map((rule) => rule.id);
   return {
     risk_level: matches.length >= 2 ? "warning" : matches.length === 1 ? "review" : "no_clear_signal",
