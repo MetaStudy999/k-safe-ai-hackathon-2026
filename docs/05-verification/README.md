@@ -1,6 +1,6 @@
 # 05단계 — 종합 검증 (Verification & Validation)
 
-> 2026-10-30 · 버전 v1.9 · **05-3c 로컬 보안 PASS / 05-4 신규 합성 평가 품질 FAIL / 05-5 문맥 개선 코드·시험 작성, 검증 대기**
+> 2026-10-30 · 버전 v2.0 · **05-5 Ubuntu 49/49·빌드·회귀평가 PASS / 05-6 새 작성자 평가 준비 / 공개배포 보류**
 >
 > [프로젝트 홈](../../README.md) · [04 구현 기록](../04-implementation/README.md) · [02 요구사항](../02-requirements/README.md) · [03 보안 설계](../03-design/README.md)
 
@@ -239,6 +239,25 @@ node --import tsx scripts/evaluate-synthetic.ts
 
 ---
 
+### 05-5 사용자 Ubuntu 실제 실행 기록 및 05-6 진입
+
+**2026-10-30 사용자 실행 로그:**
+- Git 동기화 `79a894f..8d3a9c4` (fast-forward)
+- TypeScript 검사 PASS
+- 자동시험 **49/49 PASS, 0 fail/skip**, 새 문맥 회귀시험 16개 포함
+- 기존 합성 30건 재평가 **TP=15, FN=0, FP=0, TN=10**
+- 05-4 합성 24건 재평가 **TP=12, FN=0, FP=0, TN=8**
+- Next.js 16.4.3 빌드 PASS, 정적 페이지 4/4
+- `M next-env.d.ts`, `?? package-lock.json` 로컬 사용자 파일 그대로 보존
+
+**분류 주의:** 두 재평가 모두 이미 규칙 개선에 활용된 예문이므로 **회귀시험 PASS**만 의미한다. 05-4 최초 FN=8·FP=4 기준선은 삭제/수정하지 않는다.
+
+[05-5 실측 기록](CONTEXT-RESULT-05-5-20261030.md) · [05-6 별도 작성 합성 데이터 평가 절차](BLIND-EVALUATION-05-6.md)
+
+05-6 평가기는 파일 형식 검증 및 데이터 SHA-256 출력만 준비했다. **외부 작성자 자료를 아직 수령하지 않았으므로 05-6 실행 결과 없음**. 새 데이터를 작성·검토·동결하기 전에는 코드를 추가 수정하지 않는다.
+
+---
+
 ## 4. 개선 우선순위
 
 1. **P0 배포 차단:** 공개 API 요청 제한·최대 HTTP 본문 크기 검사; 실제 민감정보 입력/로그 최소화 정책을 명확히 하고 동적 시험.
@@ -260,10 +279,12 @@ node --import tsx scripts/evaluate-synthetic.ts
 - [x] **05-3c 로컬 HTTP 통합시험 8/8 PASS**: 실제 200·400·413·415·503 및 악성 지시 처리 확인([실측 기록](HTTP-INTEGRATION-20261030.md))
 - [ ] **실제 호스팅/프록시 로그·비밀정보 처리 확인** (아직 미수행)
 - [x] **05-4 새 합성 24건 최초 평가 실제 실행 및 기준선 동결** (품질 FAIL: FN=8, FP=4)
-- [ ] **05-5 문맥 개선 코드·신규 16개 회귀시험 작성, 사용자 Ubuntu 실제 실행 대기**
+- [x] **05-5 사용자 Ubuntu 실제 실행 PASS:** 49/49, 기존 합성 30건 및 05-4 24건 재평가 FN=0·FP=0, 프로덕션 빌드 PASS
+- [x] **05-6 독립 평가 절차·도구 작성** (데이터 미수령·시험 미실행)
+- [ ] **05-6 다른 작성자의 신규 합성 데이터 수령·사전 라벨검토·동결·최초 실측** (G07 미해제)
 - [ ] 공식 참가 대회 AI 기술·심사 요구사항 충족 여부 확인
 
-**현재 판정: 05-3c LOCAL_HTTP_INTEGRATION_PASS(8/8) / 05-4 HOLDOUT_EXECUTED_QUALITY_FAIL / 05-5 REGRESSION_CODE_READY_NOT_RUN / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 신규 문장 탐지 성능이 낮아 공개 사용 부적합; 운영 WAF 429·호스팅 로그·정식 AI 조건 검증도 미완료.
+**현재 판정: 05-5 REGRESSION_PASS(49/49) / 05-6 INDEPENDENT_DATA_NOT_RECEIVED / G07_QUALITY_GATE_BLOCK / G04_WAF_NOT_CONFIGURED / DEPLOYMENT_BLOCKED.** 기존 24건에 맞춘 재평가 점수를 공개 사용 성능으로 오해하지 않는다. 실제 외부 WAF 429·호스팅 로그·공식 AI 요건도 검증되지 않았다.
 
 ## 05-1 실제 원격 실행 시도 — 환경 차단 기록
 
