@@ -99,6 +99,28 @@ node --import tsx scripts/evaluate-synthetic.ts
 
 **현재 판정: 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 규칙 기반 시연은 가능하지만 **P0 보안 통제 검증 전 공개 배포를 진행하지 않는다.**
 
+## 05-1 실제 원격 실행 시도 — 환경 차단 기록
+
+- 2026-10-30 원격 Agent Codyssey에서 **읽기 전용 상태 확인 및 Git 원격 동기화 시도**.
+- 로컬 기준: `HEAD=879df38`, `M next-env.d.ts`, `?? package-lock.json`.
+- `git fetch --no-tags origin main`에서 `Could not resolve host: github.com`, **exit 128**이 발생.
+- 최신 평가기 파일이 WSL2에 반영되지 않아 **합성 30개 평가는 NOT_RUN**. 재시도·강제 Git 변경·설치·기존 서버 중단하지 않음.
+- 사용자가 가진 두 파일의 SHA-256은 작업 전후 동일한 것으로 원격 도구가 보고함.
+- **원격 도구의 DNS 차단은 앱 코드의 실패가 아니며**, 이전 사용자 일반 Ubuntu 터미널에서는 GitHub 동기화가 정상 작동했다.
+
+### 다음 수행 — 사용자 WSL2 일반 터미널에서 05-1 검증
+
+~~~bash
+cd /home/ubuntu/codyssey/k-safe-ai-hackathon-2026
+export PATH="$HOME/.nvm/versions/node/v24.22.0/bin:$PATH"
+git pull --ff-only origin main || exit 1
+node --import tsx scripts/evaluate-synthetic.ts
+~~~
+
+숫자는 실제 출력이 확보된 이후에만 이 문서에 기록한다. **실제 운영 배포는 여전히 보류**다.
+
+---
+
 ## 6. 용어
 
 - **FNR (False Negative Rate, 미탐지율):** 위험 메시지인데 경고하지 못한 비율
