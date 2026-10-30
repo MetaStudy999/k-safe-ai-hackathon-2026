@@ -1,6 +1,6 @@
 # 05-5 — 문맥 기반 규칙 개선 및 회귀시험 (Context-aware Rules)
 
-> 2026-10-30 · **코드·회귀시험 GitHub 작성 완료 / 사용자 Ubuntu 실제 검증 대기**
+> 2026-10-30 · **사용자 Ubuntu: TypeScript·49/49 테스트·두 합성 데이터셋 재평가·프로덕션 빌드 PASS**
 >
 > [05-4 최초 기준선](HOLDOUT-BASELINE-20261030.md) · [05 전체 검증](README.md) · [배포 전 게이트](PREDEPLOY-GATE.md)
 
@@ -34,7 +34,7 @@
 - 계좌 변경에서 사기 단정 대신 주의 검토 1건
 - 이미 송금 상황에서 112 우선 안내 1건
 
-기존 자동 테스트 33개 + 신규 16개 = **예상 49개**. 아직 Ubuntu 실행 결과 없음.
+기존 자동 테스트 33개 + 신규 16개 = **49/49 PASS** (사용자 Ubuntu 실측). [실행 결과와 지표](CONTEXT-RESULT-05-5-20261030.md) 참조.
 
 **변경 전 실측 원본 05-4는 [기준선 문서](HOLDOUT-BASELINE-20261030.md)에 보존했다.** 변경 후 동일 문장 24개를 다시 돌리는 것은 **회귀시험**이며, 독립 재평가라고 부르지 않는다.
 
@@ -54,8 +54,26 @@ git status --short
 
 - **절대 테스트를 통과시키기 위해 원본 24개 예문·정답을 수정하지 않는다.**
 - 결과에 오경보나 누락이 남으면 오류 목록과 이유를 그대로 기록한다.
-- 소스·테스트 파일은 GitHub에 작성했으나 실제 동작 검증은 **PENDING**.
+- **실제 동작 검증 PASS:** TypeScript 검사·49개 자동시험·기존 30건 및 05-4 24건 재평가·프로덕션 빌드 모두 성공. 단 두 세트는 모두 개발에 사용된 자료이므로 100%는 독립 검증 결과가 아니다.
 - 실제 서비스용 모델, 독립·다양한 데이터, 호스팅/WAF·개인정보 검증은 아직 미완료.
+
+### 05-5 실제 결과 요약(2026-10-30)
+
+| 항목 | 실측 |
+|---|---:|
+| Git fast-forward | `79a894f..8d3a9c4` |
+| `npm run typecheck` | PASS |
+| `npm test` | **49 PASS / 0 FAIL** |
+| 기존 합성 30건 | TP=15, FN=0, FP=0, TN=10 |
+| 05-4 합성 24건 재시험 | TP=12, FN=0, FP=0, TN=8 |
+| `npm run build` | PASS, 정적 페이지 4/4 |
+| 로컬 미커밋 | `M next-env.d.ts`, `?? package-lock.json` |
+
+**이 재평가는 회귀시험**이다. 05-4 원본 실패 기준선을 수정하지 않으며 새 작성자가 만든 자료로 일반화 성능을 검증해야 한다.
+
+[05-5 실측 원문 증빙 문서](CONTEXT-RESULT-05-5-20261030.md) · [05-6 별도 작성 데이터 평가 절차](BLIND-EVALUATION-05-6.md)
+
+---
 
 ## 4. 재검증 후 다음 우선순위
 
@@ -63,4 +81,4 @@ git status --short
 2. 단순 키워드만으로 다루기 어려운 문맥은 외부 LLM 사용 가능성과 보안·개인정보 처리 원칙을 검토하되 실제 금융사기 확정 판정은 금지.
 3. 실제 WAF 429, 호스팅 로그, 비용 보호, 참가 공고 AI 기술 요건 확인 전 공개 배포 금지.
 
-**판정: 05-5 CODE_READY / REGRESSION_TEST_NOT_RUN / QUALITY_GATE_NOT_CLEARED / DEPLOYMENT_BLOCKED.**
+**판정: 05-5 REGRESSION_PASS / 05-6 BLIND_EVALUATION_PENDING / G07 QUALITY_GATE_NOT_CLEARED / DEPLOYMENT_BLOCKED.**
