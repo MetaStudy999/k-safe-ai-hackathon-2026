@@ -1,5 +1,9 @@
 # 🇰🇷 K-SAFE — 국민안심 AI
 
+![K-SAFE 국민안심 AI — 대한민국을 지키는 AI 보안 방패와 행복한 가족](docs/08-presentation/assets/k-safe-cover.png)
+
+[표지 원본 PNG](docs/08-presentation/assets/k-safe-cover.png) · [발표 슬라이드 디자인 가이드](docs/08-presentation/K-SAFE-SLIDE-DESIGN-SYSTEM.md)
+
 > **금융사기를 의심하는 순간, 국민의 다음 안전행동을 안내하는 AI**
 >
 > 2026 AI 해커톤 | 주제 ① AI 기반 추천 서비스 + ② AI 기반 정보보호 서비스
