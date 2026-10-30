@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { analyzeMessage, isSituation, redactMessage } from "@/lib/safety";
 import { readBoundedJson, RequestBodyError } from "@/lib/request-guard";
+import { canUseAnalyzeApi } from "@/lib/deployment-gate";
 
 export async function POST(request: Request) {
+  // 공개 배포에서는 WAF의 실제 요청률 제한을 검증하기 전까지 분석 API 차단.
+  if (!canUseAnalyzeApi(process.env)) {
+    return NextResponse.json(
+      { error: "공개 서비스의 요청 보호 설정을 확인하고 있습니다." },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   let body: unknown;
   try {
     body = await readBoundedJson(request);
