@@ -1,6 +1,6 @@
 export type Situation = "before_transfer" | "already_transferred" | "installed_app" | "unsure";
 export type RiskLevel = "warning" | "review" | "no_clear_signal";
-export type SignalId = "upfront_payment" | "unverified_app_install" | "urgent_pressure" | "impersonation" | "family_contact_scam" | "gift_card_pin_request" | "urgent_transfer_request";
+export type SignalId = "upfront_payment" | "unverified_app_install" | "urgent_pressure" | "impersonation" | "family_contact_scam" | "gift_card_pin_request" | "urgent_transfer_request" | "delivery_redirection" | "invitation_link" | "payment_cancel_verification" | "customs_payment_link";
 export type AnalysisResult = {
   risk_level: RiskLevel;
   signals: SignalId[];
@@ -35,12 +35,16 @@ export function redactMessage(input: string): string {
 
 const signalRules: { id: SignalId; reason: string; pattern: RegExp }[] = [
   { id: "upfront_payment", reason: "대출·환급을 위해 선입금이나 상환을 먼저 요구합니다.", pattern: /(선입금|먼저\s*(?:송금|입금|상환)|상환금|수수료.{0,8}(입금|송금))/i },
-  { id: "unverified_app_install", reason: "별도 앱 설치를 유도하고 있습니다.", pattern: /(앱|어플|apk|애플리케이션).{0,12}(설치|다운로드)|(설치|다운로드).{0,12}(앱|어플|apk)/i },
-  { id: "urgent_pressure", reason: "즉시 행동하도록 압박하는 표현이 있습니다.", pattern: /(지금\s*바로|즉시|당장|오늘\s*안에|계정.{0,8}(정지|차단))/i },
+  { id: "unverified_app_install", reason: "별도 앱 설치를 유도하고 있습니다.", pattern: /(?:앱|어플|apk|애플리케이션).{0,25}(?:설치|다운로드)\s*(?:해\s*(?:주세요|주십시오|줘|요)|하(?:세요|십시오|라)|해야|해요|하셔야|바랍니다|해야\s*합니다)|(?:설치|다운로드)\s*(?:하(?:세요|십시오)|해\s*주세요).{0,15}(?:앱|어플|apk)/i },
+  { id: "urgent_pressure", reason: "즉시 행동하도록 압박하는 표현이 있습니다.", pattern: /(?:지금\s*바로|즉시|당장|오늘\s*안에|계정.{0,10}(?:정지|차단).{0,18}(?:됩니다|예정|될\s*수|진행))/i },
   { id: "impersonation", reason: "금융회사 또는 공공기관을 사칭할 가능성이 있습니다.", pattern: /(금융감독원|경찰청|검찰청|공공기관|은행\s*담당자|금융회사\s*담당자)/i },
   { id: "family_contact_scam", reason: "가족인 것처럼 연락하며 휴대전화 문제를 핑계로 돈이나 상품권을 요구합니다. 가족의 기존 번호로 따로 확인하세요.", pattern: /(?=[\s\S]*(?:엄마|아빠|어머니|아버지|딸|아들))(?=[\s\S]*(?:휴대폰|핸드폰|폰|액정|전화번호))(?=[\s\S]*(?:고장|깨져|수리|이\s*번호|새\s*번호|번호\s*바꿨))(?=[\s\S]*(?:송금|이체|입금|상품권|핀\s*번호|돈|계좌))[\s\S]*/i },
   { id: "gift_card_pin_request", reason: "상품권·기프트카드의 PIN 번호나 코드를 전달해 달라는 요청입니다.", pattern: /(?:문화\s*상품권|상품권|기프트\s*카드|모바일\s*쿠폰).{0,80}(?:핀\s*번호|PIN\s*번호|기프트\s*코드|코드|번호|카톡|보내)|(?:핀\s*번호|PIN\s*번호|기프트\s*코드).{0,40}(?:보내|전송|알려)/i },
-  { id: "urgent_transfer_request", reason: "급한 상황을 내세워 계좌이체·송금 등을 요구합니다.", pattern: /(?:급하게|급히|빨리|당장|지금).{0,55}(?:이체|송금|입금|돈.{0,8}보내|계좌.{0,12}보내)|(?:이체|송금|입금).{0,40}(?:급해|급합니다|빨리|지금)/i }
+  { id: "urgent_transfer_request", reason: "급한 상황을 내세워 계좌이체·송금 등을 요구합니다.", pattern: /(?:급하게|급히|빨리|당장|지금).{0,55}(?:이체|송금|입금|돈.{0,8}보내|계좌.{0,12}보내)|(?:이체|송금|입금).{0,40}(?:급해|급합니다|빨리|지금)/i },
+  { id: "delivery_redirection", reason: "배송지 오류를 내세워 별도 링크에서 수정을 유도합니다. 공식 택배사 경로로 확인하세요.", pattern: /(?:택배|배송지|배송).{0,70}(?:잘못|오류|틀렸|수정|변경).{0,80}(?:링크|주소|페이지|확인)/i },
+  { id: "invitation_link", reason: "청첩장·초대장 링크 열람을 유도합니다. 발신자에게 기존 연락 수단으로 확인하세요.", pattern: /(?:모바일\s*)?(?:청첩장|결혼식\s*초대장).{0,90}(?:링크|주소|URL|접속|클릭)/i },
+  { id: "payment_cancel_verification", reason: "카드 결제 승인 이후 별도 취소·본인확인 페이지로 이동을 유도합니다.", pattern: /(?:카드|결제).{0,45}(?:결제|승인).{0,90}(?:결제\s*취소|취소\s*페이지|본인\s*확인|인증)/i },
+  { id: "customs_payment_link", reason: "관세·통관 미납을 내세워 조회 링크나 결제를 유도합니다.", pattern: /(?:관세|통관).{0,50}(?:미납|납부|결제).{0,85}(?:배송\s*조회|링크|페이지|결제|납부)/i }
 ];
 
 export function getActions(situation: Situation, signals: SignalId[] = []): string[] {
