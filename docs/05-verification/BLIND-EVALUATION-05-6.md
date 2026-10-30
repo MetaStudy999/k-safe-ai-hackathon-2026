@@ -1,6 +1,6 @@
 # 05-6 — 독립 작성 합성 자료 평가 프로토콜
 
-> 2026-10-30 · **평가 도구 작성 완료 / 새 평가 데이터 미수령·실행 안 함**
+> 2026-10-30 · **사용자 Ubuntu TypeScript 검사 PASS / 외부 합성 데이터 미수령·실제 평가 미실행**
 >
 > [05-5 실측](CONTEXT-RESULT-05-5-20261030.md) · [05-4 최초 실패 기준선](HOLDOUT-BASELINE-20261030.md) · [05단계 전체](README.md) · [배포 전 승인 기준](PREDEPLOY-GATE.md)
 
@@ -75,6 +75,7 @@ node --import tsx scripts/evaluate-blind.ts "$HOME/k-safe-eval-external.json"
 - [x] 05-4 최초 실패 기준선 보존
 - [x] 05-5 TypeScript·49개 회귀시험·두 합성 세트 재평가·빌드 실제 PASS 기록
 - [x] 05-6 외부 합성 데이터 검사기와 시험 절차 작성
+- [x] 2026-10-30 사용자 Ubuntu에서 `git pull --ff-only` 성공(`8d3a9c4..ba7d6e4`), `npm run typecheck` PASS 및 `05-6 EVALUATOR READY` 출력 확인. **실제 입력 JSON 없이 평가 실행한 것이 아님**
 - [ ] 별도 작성자의 독립 합성 데이터 수령
 - [ ] 원본·라벨 검토, SHA-256 동결, 최초 평가
 - [ ] 원본 결과 보존 및 G07 품질 게이트 재평가
