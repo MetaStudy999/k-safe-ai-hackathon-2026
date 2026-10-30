@@ -1,6 +1,6 @@
 # 05-6 — 독립 작성 합성 자료 평가 프로토콜
 
-> 2026-10-30 · **사용자 Ubuntu TypeScript 검사 PASS / 외부 합성 데이터 미수령·실제 평가 미실행**
+> 2026-10-30 · **EVALUATOR_READY / DATA_PENDING — 평가 환경 준비 / 독립 데이터 미수령·평가 미실행**
 >
 > [05-5 실측](CONTEXT-RESULT-05-5-20261030.md) · [05-4 최초 실패 기준선](HOLDOUT-BASELINE-20261030.md) · [05단계 전체](README.md) · [배포 전 승인 기준](PREDEPLOY-GATE.md)
 
@@ -22,43 +22,29 @@
 
 프로젝트 밖 별도 로컬 파일로 작성한다. 파일명 예시: `$HOME/k-safe-eval-external.json`. **이 파일은 실제 연락처나 개인정보를 포함하지 않아야 하며, 별도의 보관·공유 동의를 얻기 전까지 Git에 등록하지 않는다.**
 
-전체 24~200건. **위험 10건 이상, 정상 10건 이상, 경계 4건 이상**. JSON 최상위는 사례 배열:
+전체 24~200건, 256KiB 이하. **위험 10건 이상, 정상 10건 이상, 경계 4건 이상**. JSON 최상위는 사례 배열이며 각 객체는 문자열 필드 `id`, `expected`, `category`, `message`만 포함한다.
 
-```json
-[
-  {
-    "id": "EX001",
-    "expected": "scam",
-    "category": "가상의 금융 위험 상황",
-    "message": "별도 작성자가 만든 합성 위험 문장"
-  },
-  {
-    "id": "EX002",
-    "expected": "benign",
-    "category": "정상적인 일상 상황",
-    "message": "별도 작성자가 만든 합성 정상 문장"
-  },
-  {
-    "id": "EX003",
-    "expected": "borderline",
-    "category": "확인이 필요한 상황",
-    "message": "의도가 불분명한 합성 문장"
-  }
-]
-```
+별도 작성자에게 [한국어 작성 안내서](BLIND-EVALUATOR-GUIDE-05-6.md)와 [빈 양식](blind-evaluation-empty.json)을 전달한다. 빈 양식은 `[]`이며, 사례가 없어 검증에 실패하는 것이 정상이다. 개발자가 평가용 문장이나 정답을 채워 전달하지 않는다. 필드별 제한·민감정보 대체 방식·라벨 검토·동결 절차는 안내서를 따른다.
 
-위 세 행은 **형식 예시일 뿐 실제 평가 데이터가 아니다**.
+## 3. 준비 및 실행 — 형식 검사와 품질 평가 구분
 
-## 3. 준비된 평가 명령 — 실제 데이터가 제공된 후에만 실행
+파일이 없으면 긴 Node.js 스택 대신 `DATA_FILE=NOT_FOUND`, 필요한 경로, 작성 안내와 다음 명령을 출력한다. 종료 코드는 1이며 **평가 실패 점수나 PASS를 생성하지 않는다**. 경로를 생략하면 `$HOME/k-safe-eval-external.json`을 사용한다.
+
+파일을 수령한 뒤 먼저 아래 형식 검사만 실행한다. 이 모드에서는 탐지 함수를 호출하지 않는다.
 
 ```bash
 cd /home/ubuntu/codyssey/k-safe-ai-hackathon-2026
 export PATH="$HOME/.nvm/versions/node/v24.22.0/bin:$PATH"
-git pull --ff-only origin main || exit 1
+node --import tsx scripts/evaluate-blind.ts "$HOME/k-safe-eval-external.json" --validate-only
+```
+
+`validation: PASS`는 파일 형식만 통과했다는 뜻이며 `evaluation: NOT_RUN`이다. 작성 독립성·라벨·민감정보를 사람이 검토하고 원본 해시와 실제 코드 버전을 동결한 후에만 최초 평가를 실행한다. 평가 직전 코드가 바뀌는 것을 막기 위해 이 절차에서는 자동 Git 동기화를 하지 않는다.
+
+```bash
 node --import tsx scripts/evaluate-blind.ts "$HOME/k-safe-eval-external.json"
 ```
 
-- [평가 실행기](../../scripts/evaluate-blind.ts)는 JSON의 필수 필드·사례 수·중복·라벨과 기본 개인정보 형식 등을 검사.
+- [평가 실행기](../../scripts/evaluate-blind.ts)와 [데이터 검사기](../../scripts/lib/blind-data.ts)는 UTF-8·JSON·필수 필드/타입/길이·사례 수·중복 ID·라벨별 최소 건수·기본 민감정보 형식을 검사. 모든 행을 검증한 뒤에만 평가한다. 오류는 행 번호·필드명으로 알리고 원문 값은 표시하지 않는다.
 - 결과에는 **평가 데이터 SHA-256**, TP/FN/FP/TN, 재현율·오경보율, 실패한 **ID·범주**만 표시하고 원문 메시지는 출력하지 않음.
 - 원문 데이터가 외부 시스템으로 전송되도록 코딩하지 않았으며, 임의로 Git 커밋·푸시·배포하지 않음.
 - 정규식 마스킹만으로 개인정보 없음이 보장되는 것은 아니므로 사람이 별도로 검토해야 함.
@@ -76,9 +62,26 @@ node --import tsx scripts/evaluate-blind.ts "$HOME/k-safe-eval-external.json"
 - [x] 05-5 TypeScript·49개 회귀시험·두 합성 세트 재평가·빌드 실제 PASS 기록
 - [x] 05-6 외부 합성 데이터 검사기와 시험 절차 작성
 - [x] 2026-10-30 사용자 Ubuntu에서 `git pull --ff-only` 성공(`8d3a9c4..ba7d6e4`), `npm run typecheck` PASS 및 `05-6 EVALUATOR READY` 출력 확인. **실제 입력 JSON 없이 평가 실행한 것이 아님**
+- [x] 파일 누락 안내·평가 없는 형식 검증 모드·별도 평가자용 안내서·빈 양식 준비
 - [ ] 별도 작성자의 독립 합성 데이터 수령
 - [ ] 원본·라벨 검토, SHA-256 동결, 최초 평가
 - [ ] 원본 결과 보존 및 G07 품질 게이트 재평가
 - [ ] G03 호스팅 로그·G04 WAF 429·G06 공식 AI 요건 확인
 
-**05-6 PREPARED / BLIND_DATA_NOT_RECEIVED / G07_BLOCKED / PUBLIC_DEPLOYMENT_NOT_APPROVED**.
+**EVALUATOR_READY / DATA_PENDING / G07_BLOCKED / PUBLIC_DEPLOYMENT_NOT_APPROVED**. 독립 평가 데이터는 없으며 탐지 품질 PASS를 선언하지 않는다.
+
+## 6. 평가 환경 개선 실제 검증 기록 — 2026-10-30
+
+Node.js `v24.22.0`에서 다음을 실제 실행했다. 아래 PASS는 도구·기존 기능 확인 결과이며 독립 탐지 품질 평가가 아니다.
+
+| 단계 | 실제 확인 | 판정 |
+|---|---|---|
+| 1. 누락 파일 안내 | `/home/ubuntu/k-safe-eval-external.json --validate-only` 요청 시 `DATA_FILE=NOT_FOUND`, 필요한 경로·준비 방법·다음 명령 출력. Node.js 스택 없음, 종료 코드 1 | 안내 동작 PASS |
+| 2. 입력 검증과 안내서 | 새 검증 테스트 13개 통과. 필수 필드·타입·길이·건수·라벨 구성·중복·민감정보 형식·원문 미출력·검증 전용 모드 확인. 한국어 안내서와 빈 배열 양식 준비 | PASS |
+| 3. TypeScript | `npm run typecheck` 종료 코드 0 | PASS |
+| 4. 전체 자동 테스트 | `npm test`: 기존 49개 + 새 13개 = 62개 통과, 실패·건너뜀 0 | PASS |
+| 5. 프로덕션 빌드 | `npm run build`: 컴파일·TypeScript·정적 페이지 4/4 완료 | PASS |
+| 6. 기존 기능 회귀평가 | 기존 합성 30건 TP=15/FN=0/FP=0/TN=10, 기존 24건 TP=12/FN=0/FP=0/TN=8 | 회귀 확인 PASS |
+| 7. 독립 평가 | 최종 JSON 미수령. 독립 평가·성능 판정 미실행 | DATA_PENDING / NOT_RUN |
+
+`src/lib/safety.ts`, 기존 합성 자료 두 파일, 최초 기준선 두 문서, 사용자 파일 `next-env.d.ts`·`package-lock.json`의 작업 전후 SHA-256이 일치했다. 기존 합성 자료를 독립 평가용으로 복사하지 않았고, 최종 평가 JSON을 만들거나 가짜 결과를 채우지 않았다. 새 테스트 픽스처는 형식 검증만 수행하며 임시 JSON은 테스트 종료 시 삭제한다. Git 커밋·푸시·공개 배포는 수행하지 않았다.

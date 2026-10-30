@@ -1,87 +1,127 @@
 /**
  * 05-6 외부 작성 합성 자료 평가용 실행기.
- *
- * 반드시 코드를 보지 않은 별도 작성자가 작성하고, 개발자에게 공개되기 전에
- * 라벨 검토·원본 SHA 기록·버전 동결을 마친 JSON 파일을 전달받으세요.
- * 이 프로그램은 원본 메시지 내용은 출력하지 않습니다.
+ * 별도 작성자의 사전 라벨 검토·원본 SHA 기록·버전 동결 후에만 평가한다.
+ * 원문 메시지를 출력하지 않으며 --validate-only에서는 탐지 함수를 호출하지 않는다.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { analyzeMessage } from "../src/lib/safety";
+import { homedir } from "node:os";
+import { resolve } from "node:path";
+import { BlindDataError, MAX_DATA_BYTES, parseBlindData } from "./lib/blind-data";
 
-type Label = "scam" | "benign" | "borderline";
-type Case = { id: string; expected: Label; category: string; message: string };
+const GUIDE = "docs/05-verification/BLIND-EVALUATOR-GUIDE-05-6.md";
 
-function fail(msg: string): never {
-  throw new Error("검증 데이터 오류: " + msg);
+// 복사 가능한 Bash 인수로 표시한다. 경로에 공백·따옴표가 있어도 안전하다.
+function shellQuote(value: string): string {
+  return "'" + value.replaceAll("'", "'\\''") + "'";
 }
 
-const filepath = process.argv[2];
-if (!filepath || !filepath.endsWith(".json")) {
-  fail("입력 JSON 경로가 필요합니다. 사용법: node --import tsx scripts/evaluate-blind.ts 경로.json");
-}
-const raw = readFileSync(filepath);
-if (raw.byteLength > 256 * 1024) fail("평가 파일은 256KiB 이하여야 합니다.");
-const sha256 = createHash("sha256").update(raw).digest("hex");
-let parsed: unknown;
-try {
-  parsed = JSON.parse(raw.toString("utf-8")) as unknown;
-} catch {
-  fail("유효한 JSON 파일이 아닙니다.");
+function showNextSteps(filepath: string): void {
+  const command = `node --import tsx scripts/evaluate-blind.ts ${shellQuote(filepath)}`;
+  console.error(`필요한 파일 경로: ${filepath}`);
+  console.error(`준비 방법: 별도 평가자가 ${GUIDE}와 빈 양식을 받아 새 합성 사례를 작성하세요.`);
+  console.error("기존 규칙·합성 자료를 복사하지 말고, 24~200건(위험>=10, 정상>=10, 경계>=4)을 작성·검토하세요.");
+  console.error(`다음 실행 명령(형식 검증만): ${command} --validate-only`);
+  console.error(`사람의 독립성·라벨 검토 및 원본/코드 동결 후 평가: ${command}`);
 }
 
-if (!Array.isArray(parsed)) fail("최상위 JSON은 합성 사례 배열이어야 합니다.");
-if (parsed.length < 24 || parsed.length > 200) fail("평가 사례는 24~200건이어야 합니다.");
-const ids = new Set<string>();
-const seen = { scam: 0, benign: 0, borderline: 0 };
-const rows: { id: string; category: string; expected: Label; predicted: string; risk_level: string; correct: boolean | null }[] = [];
-
-for (const item of parsed as unknown[]) {
-  if (!item || typeof item !== "object" || Array.isArray(item)) fail("사례는 JSON 객체여야 합니다.");
-  const o = item as Record<string, unknown>;
-  if (typeof o.id !== "string" || !/^[A-Z0-9_-]{2,32}$/.test(o.id)) fail("사례 ID는 대문자·숫자·언더스코어 등 2~32자");
-  if (ids.has(o.id)) fail("중복 ID가 있습니다: " + o.id);
-  ids.add(o.id);
-  if (o.expected !== "scam" && o.expected !== "benign" && o.expected !== "borderline") fail("허용 라벨: scam, benign, borderline");
-  if (typeof o.category !== "string" || o.category.trim().length < 2 || o.category.length > 80) fail("카테고리 길이 오류");
-  if (typeof o.message !== "string" || !o.message.trim() || o.message.length > 2000) fail("메시지는 1~2,000자여야 합니다.");
-  // 평가 대상은 실제 피해 사례가 아닌 새로 작성한 합성 문장만 허용.
-  // 이 정규식만으로 개인정보 유무를 완벽히 확인할 수는 없다.
-  if (/(?:\d{3}[- .]?\d{3,4}[- .]?\d{4}|\d{6}[- ]\d{7}|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,})/.test(o.message)) {
-    fail("연락처·신분번호·이메일 형태의 값이 있습니다. 합성 문자열로 대체한 뒤 다시 검토하세요.");
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  if (args.includes("--help") || args.includes("-h")) {
+    console.log("사용법: node --import tsx scripts/evaluate-blind.ts [경로.json] [--validate-only]");
+    console.log(`기본 경로: ${resolve(homedir(), "k-safe-eval-external.json")}`);
+    console.log(`평가자 안내서: ${GUIDE}`);
+    return;
   }
-  const label = o.expected as Label;
-  seen[label] += 1;
-  const result = analyzeMessage(o.message, "before_transfer");
-  const flagged = result.risk_level !== "no_clear_signal";
-  rows.push({
-    id: o.id, category: o.category, expected: label,
-    predicted: flagged ? "flagged" : "no_clear_signal",
-    risk_level: result.risk_level,
-    correct: label === "borderline" ? null : label === "scam" ? flagged : !flagged
+  const paths = args.filter(arg => arg !== "--validate-only");
+  if (paths.length > 1 || paths.some(arg => arg.startsWith("-"))) {
+    console.error("ARGUMENTS=FAIL\n사용법: node --import tsx scripts/evaluate-blind.ts [경로.json] [--validate-only]\nEVALUATION=NOT_RUN");
+    process.exitCode = 1;
+    return;
+  }
+  const filepath = resolve(paths[0] ?? resolve(homedir(), "k-safe-eval-external.json"));
+  if (!filepath.endsWith(".json")) {
+    console.error("DATA_FILE=INVALID\nVALIDATION=FAIL\n원인: .json 확장자의 파일 경로가 필요합니다.\nEVALUATION=NOT_RUN");
+    showNextSteps(filepath);
+    process.exitCode = 1;
+    return;
+  }
+
+  let raw: Buffer;
+  try {
+    const stat = statSync(filepath);
+    if (!stat.isFile()) throw new BlindDataError("경로가 일반 파일이 아닙니다. JSON 파일을 지정하세요.");
+    if (stat.size > MAX_DATA_BYTES) throw new BlindDataError("평가 파일은 256KiB 이하여야 합니다.");
+    raw = readFileSync(filepath);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") {
+      console.error("DATA_FILE=NOT_FOUND\nVALIDATION=NOT_RUN\nEVALUATION=NOT_RUN\nSTATUS=EVALUATOR_READY / DATA_PENDING");
+      console.error("원인: 지정한 경로에 독립 평가 JSON 파일이 없습니다.");
+    } else {
+      console.error(`DATA_FILE=${error instanceof BlindDataError ? "INVALID" : "READ_ERROR"}\nVALIDATION=FAIL\nEVALUATION=NOT_RUN`);
+      console.error(`원인: ${error instanceof BlindDataError ? error.message : "파일을 읽을 수 없습니다. 파일 접근 권한과 경로를 확인하세요."}`);
+    }
+    showNextSteps(filepath);
+    process.exitCode = 1;
+    return;
+  }
+
+  let data: ReturnType<typeof parseBlindData>;
+  try {
+    data = parseBlindData(raw);
+  } catch (error) {
+    if (!(error instanceof BlindDataError)) throw error;
+    console.error(`DATA_FILE=INVALID\nVALIDATION=FAIL\n원인: ${error.message}\nEVALUATION=NOT_RUN`);
+    showNextSteps(filepath);
+    process.exitCode = 1;
+    return;
+  }
+  const sha256 = createHash("sha256").update(raw).digest("hex");
+  const { cases, counts: seen } = data;
+  if (args.includes("--validate-only")) {
+    console.log(JSON.stringify({
+      data_file: "FOUND", validation: "PASS", evaluation: "NOT_RUN",
+      data_sha256: sha256, sample_size: cases.length,
+      labeled_scam: seen.scam, labeled_benign: seen.benign, borderline_excluded: seen.borderline,
+      human_review: "REQUIRED: 독립 작성·라벨·민감정보 확인 및 원본/코드 동결. 형식 검증 PASS는 품질 평가 PASS가 아닙니다."
+    }, null, 2));
+    return;
+  }
+
+  // 전체 파일 검증에 성공한 후에만 기존 탐지 코드를 읽고 실행한다.
+  const { analyzeMessage } = await import("../src/lib/safety");
+  const rows = cases.map(item => {
+    const result = analyzeMessage(item.message, "before_transfer");
+    const flagged = result.risk_level !== "no_clear_signal";
+    return {
+      id: item.id, category: item.category, expected: item.expected,
+      predicted: flagged ? "flagged" : "no_clear_signal",
+      risk_level: result.risk_level,
+      correct: item.expected === "borderline" ? null : item.expected === "scam" ? flagged : !flagged
+    };
   });
+  const tp = rows.filter(r => r.expected === "scam" && r.predicted === "flagged").length;
+  const fp = rows.filter(r => r.expected === "benign" && r.predicted === "flagged").length;
+  console.log(JSON.stringify({
+    dataset: "05-6 independently authored synthetic input (independence requires human provenance review)",
+    data_sha256: sha256,
+    sample_size: rows.length,
+    labeled_scam: seen.scam,
+    labeled_benign: seen.benign,
+    borderline_excluded: seen.borderline,
+    true_positive: tp,
+    false_negative: seen.scam - tp,
+    false_positive: fp,
+    true_negative: seen.benign - fp,
+    sensitivity_recall: Number((tp / seen.scam).toFixed(4)),
+    false_positive_rate: Number((fp / seen.benign).toFixed(4)),
+    failed_cases: rows.filter(r => r.correct === false),
+    ambiguous_cases: rows.filter(r => r.correct === null)
+  }, null, 2));
 }
 
-if (seen.scam < 10 || seen.benign < 10 || seen.borderline < 4) {
-  fail("구성 조건을 충족해야 합니다: 위험 >=10, 정상 >=10, 경계 >=4");
-}
-const tp = rows.filter(r => r.expected === "scam" && r.predicted === "flagged").length;
-const fp = rows.filter(r => r.expected === "benign" && r.predicted === "flagged").length;
-const report = {
-  dataset: "05-6 independently authored synthetic input (independence requires human provenance review)",
-  data_sha256: sha256,
-  sample_size: rows.length,
-  labeled_scam: seen.scam,
-  labeled_benign: seen.benign,
-  borderline_excluded: seen.borderline,
-  true_positive: tp,
-  false_negative: seen.scam - tp,
-  false_positive: fp,
-  true_negative: seen.benign - fp,
-  sensitivity_recall: Number((tp / seen.scam).toFixed(4)),
-  false_positive_rate: Number((fp / seen.benign).toFixed(4)),
-  failed_cases: rows.filter(r => r.correct === false),
-  ambiguous_cases: rows.filter(r => r.correct === null),
-  // No raw messages in report. File provenance must still be reviewed independently.
-};
-console.log(JSON.stringify(report, null, 2));
+main().catch(() => {
+  console.error("EVALUATOR=ERROR\n원인: 예상하지 못한 내부 오류입니다. TypeScript 검사와 자동 테스트를 확인하세요.\nEVALUATION=FAILED");
+  process.exitCode = 1;
+});
