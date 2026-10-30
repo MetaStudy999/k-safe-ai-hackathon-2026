@@ -1,6 +1,6 @@
 # 05단계 — 종합 검증 (Verification & Validation)
 
-> 2026-10-30 · 버전 v1.4 · **05-3a Ubuntu 24/24 테스트·빌드 PASS / 05-3b 공개 방화벽 진입 게이트 작성·실행 검증 대기**
+> 2026-10-30 · 버전 v1.5 · **05-3a Ubuntu 24/24 PASS / 05-3b Ubuntu 27/27·빌드·HTTP 503 로컬 PASS / 05-3c 개인정보·악성 입력 검증 준비**
 >
 > [프로젝트 홈](../../README.md) · [04 구현 기록](../04-implementation/README.md) · [02 요구사항](../02-requirements/README.md) · [03 보안 설계](../03-design/README.md)
 
@@ -149,8 +149,27 @@ node --import tsx scripts/evaluate-synthetic.ts
 
 - [설정·검증 가이드](RATE-LIMIT-SETUP.md)를 작성했다.
 - `src/lib/deployment-gate.ts` + API 연동을 통해 프로덕션에서 `RATE_LIMIT_RULE_VERIFIED=true`를 명시하기 전에는 HTTP 503으로 차단하도록 설계·작성했다.
-- 신규 단위시험 3개(개발 허용·프로덕션 기본 차단·명시적 승인 시 허용)를 추가했다. 현재 **실행 결과는 아직 없음**.
+- 신규 단위시험 3개(개발 허용·프로덕션 기본 차단·명시적 승인 시 허용)를 추가했다. **2026-10-30 사용자 Ubuntu에서 27/27 전체 테스트 PASS** 확인.
 - **실제 요청률 제한은 WAF에서 설정해야 한다.** 환경변수는 검증 선언일 뿐 분산 제한기가 아니다. Vercel WAF 구성, 외부 요청 429 실증, 공개 호스트 전수 점검은 아직 미착수.
+
+### 05-3b 실제 로컬 검증 증빙 — 사용자 Ubuntu 실행(2026-10-30)
+
+| 검증 항목 | 관측 | 판정 |
+|---|---|---|
+| Git fast-forward | `6472a00..434814d` | PASS |
+| `npm run typecheck` | 명령 성공, 후속 명령 진행 | PASS |
+| `npm test` | **27/27 PASS, 0 FAIL**, 소요 약 159.77ms | PASS |
+| `npm run build` | Next.js 16.4.3, 페이지 4/4, 컴파일·타입 검사 성공 | PASS |
+| 로컬 프로덕션 `GET /` | `HOME=PASS` | PASS |
+| 보호 미검증 `POST /api/analyze` | `PRODUCTION_API_HTTP=503` | PASS |
+| 최종 배시 증빙 | `05-3b LOCAL_GATE_PASS` | PASS |
+| 실제 분산 WAF 요청률 제한, 429 | 실행·검증되지 않음 | **PENDING** |
+
+**증거의 한계:** 503은 허용되지 않은 운영 API를 막는 게이트의 동작만 입증한다. IP·사용자별 요청 제한, 다중 인스턴스 간 공유 제한, Preview/공개 URL 보호, WAF의 실제 429는 검증되지 않았다.
+
+**로컬 변경사항 보존:** 사용자 제공 `git status --short`에서 `M next-env.d.ts`와 `?? package-lock.json` 확인. 원격 기록만 수정하며 해당 작업 파일은 변경·초기화하지 않는다.
+
+---
 
 ## 4. 개선 우선순위
 
@@ -167,11 +186,12 @@ node --import tsx scripts/evaluate-synthetic.ts
 - [x] **합성 30개 실제 평가 실행 및 정량 결과 수집** (2026-10-30 사용자가 실행, Recall 73.33%, FPR 20%)
 - [x] **05-2 탐지 규칙 개선 후 Ubuntu 실제 실행 PASS:** 19/19 자동 테스트, 합성 30건 TP=15/FN=0/FP=0/TN=10. 보안 취약점 개선은 별도.
 - [x] **05-3a** 요청 본문 8KiB 상한 단위시험 PASS, 실제 HTTP 413 검증 필요
-- [ ] **05-3b** WAF 기반 실제 요청 횟수 제한 설정·429 검증(현재 미구성), 보호 게이트 코드 작성 완료
+- [x] **05-3b 로컬 보호 게이트 시험 PASS:** TypeScript PASS, 27/27 자동 테스트, 프로덕션 빌드 PASS, GET / 정상, POST /api/analyze HTTP 503
+- [ ] **05-3b 실제 WAF 설정 및 429 응답 검증**(미구성, 공개 배포 차단 유지)
 - [ ] 개인정보·로그·인젝션 시험
 - [ ] 공식 참가 대회 AI 기술·심사 요구사항 충족 여부 확인
 
-**현재 판정: 05-3a UNIT_AND_BUILD_PASS / 05-3b CODE_READY, WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 합성 30개 결과는 과적합 가능성이 있으며, 실제 429·개인정보·HTTP 보안 검증 전에는 공개 배포하지 않는다.
+**현재 판정: 05-3a UNIT_AND_BUILD_PASS / 05-3b LOCAL_GATE_PASS, WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 실제 WAF 429 및 개인정보·HTTP 동적 보안 검증 전에는 공개 배포하지 않는다.
 
 ## 05-1 실제 원격 실행 시도 — 환경 차단 기록
 
