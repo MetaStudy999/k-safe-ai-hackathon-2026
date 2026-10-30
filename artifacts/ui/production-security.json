@@ -1,0 +1,20 @@
+[
+  {
+    "path": "/",
+    "expected": 200,
+    "status": 200,
+    "cacheControl": "s-maxage=31536000"
+  },
+  {
+    "path": "/lab",
+    "expected": 404,
+    "status": 404,
+    "cacheControl": "s-maxage=31536000"
+  },
+  {
+    "path": "/api/analyze",
+    "expected": 503,
+    "status": 503,
+    "cacheControl": "no-store"
+  }
+]
