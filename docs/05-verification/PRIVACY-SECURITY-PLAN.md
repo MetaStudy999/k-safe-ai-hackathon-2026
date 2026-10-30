@@ -1,6 +1,6 @@
 # 05-3c — 개인정보 및 악성 입력 보안 검증
 
-> 2026-10-30 · 상태: **05-3c Ubuntu 33/33 단위시험·빌드 PASS / 실제 HTTP 통합시험·운영 로그 검증 대기**
+> 2026-10-30 · 상태: **05-3c Ubuntu 33/33·빌드·HTTP 8/8 PASS / 운영 호스팅 로그·WAF 검증 대기**
 >
 > [05단계 보고서](README.md) · [04 구현](../04-implementation/README.md) · [프로젝트 홈](../../README.md)
 
@@ -57,7 +57,7 @@ git status --short
 
 **2026-10-30 실제 결과:** 타입 검사 PASS, 자동 테스트 33개 PASS, 빌드 PASS. 재실행은 필요 시에만 진행한다.
 
-## 5. 실제 API 동적 시험 — 실행 스크립트 준비(미실행)
+## 5. 실제 API 동적 시험 — 사용자 Ubuntu 실행 완료
 
 개발 서버나 다른 작업 중인 포트를 건드리지 않도록 전용 테스트 포트를 사용한다.
 
@@ -69,14 +69,28 @@ git status --short
 - 서버 로그/응답에 원본 합성 민감정보가 노출되지 않음을 확인한다.
 - 운영 WAF의 429는 Vercel 또는 실제 선택한 호스팅 환경에서 **추가로 수행**해야 한다.
 
+### 05-3c 실제 통합시험 보존 기록
+
+2026-10-30 사용자가 `python3 scripts/verify-http-security.py`를 실행하여 다음 8건 모두 통과함:
+
+- 공개 전 API 보호 차단 503 · 메인 페이지 200
+- 합성 정상 분석 200 · 잘못된 JSON 400 · 미지원 형식 415
+- 8KiB 요청 크기 초과 413 · 메시지 길이 초과 400 · 악성 지시 입력 처리 200 및 안전 권고 확인
+
+상세 표: [실제 HTTP 통합시험 8/8 보고서](HTTP-INTEGRATION-20261030.md)
+
+단, 테스트 프로그램은 로컬 전용이며 **실제 클라우드 호스팅 로그 수집 정책**을 확인한 결과가 아니다. 네트워크로 입력된 모든 개인정보 형식이 안전하게 가려진다는 보장도 아니다.
+
+---
+
 ## 6. PASS/FAIL 게이트
 
 - [x] 05-3b 사용자 Ubuntu 로컬 게이트 **27/27, 503 PASS** 기록
 - [x] 05-3c 마스킹 보완 코드 및 **신규 6개 합성 시험** GitHub 작성
 - [x] 05-3c 사용자 Ubuntu TypeScript·33개 테스트·빌드 실제 PASS
-- [ ] 로컬 HTTP 200/400/413/415 시험
+- [x] 로컬 HTTP 200/400/413/415 및 503 시험 **8/8 PASS** ([실측](HTTP-INTEGRATION-20261030.md))
 - [ ] 요청/응답·서버 로그·DOM 보안 점검
 - [ ] 실사용 임의 신규 합성 공격 시나리오 추가
 - [ ] 운영 WAF 429 및 모든 공개 엔드포인트 보호 확인
 
-**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c UNIT_AND_BUILD_PASS · HTTP_INTEGRATION_PENDING / PUBLIC_DEPLOYMENT_BLOCKED.** 실제 HTTP·WAF·호스팅 로그 검증 전에는 공개하지 않는다.
+**현재 판정: 05-3c UNIT_AND_BUILD_PASS · HTTP_INTEGRATION_PASS(8/8) / HOSTING_LOGS_NOT_VERIFIED / WAF_NOT_CONFIGURED / PUBLIC_DEPLOYMENT_BLOCKED.** 실제 배포 환경의 로그·방화벽은 아직 검증되지 않았다.
