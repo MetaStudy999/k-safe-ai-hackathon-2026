@@ -1,6 +1,6 @@
 # 05단계 — 종합 검증 (Verification & Validation)
 
-> 2026-10-30 · 버전 v1.8 · **05-3c Ubuntu 33/33·빌드·HTTP 8/8 PASS / 05-4 신규 합성 평가 준비 / 운영 WAF 미검증**
+> 2026-10-30 · 버전 v1.9 · **05-3c 로컬 보안 PASS / 05-4 신규 합성 평가 품질 FAIL / 05-5 문맥 개선 코드·시험 작성, 검증 대기**
 >
 > [프로젝트 홈](../../README.md) · [04 구현 기록](../04-implementation/README.md) · [02 요구사항](../02-requirements/README.md) · [03 보안 설계](../03-design/README.md)
 
@@ -200,12 +200,42 @@ node --import tsx scripts/evaluate-synthetic.ts
 - **범위 한계:** 호스팅/프록시 로그, 분산 WAF 요청률 제한, 429, 대규모 DoS 방어 및 모든 악성 입력 방어를 검증한 것은 아니다.
 - 로컬 작업물 `M next-env.d.ts` 및 `?? package-lock.json`은 그대로 보존.
 
-### 05-4 신규 합성 평가(다음 작업)
+### 05-4 신규 합성 평가(실행 완료)
 
 - [배포 전 보안 승인표](PREDEPLOY-GATE.md) 작성. G04 외부 WAF 미설정으로 공개 배포 **BLOCK** 유지.
 - [새 합성 사례 24개](../../data/synthetic/holdout-20261030.ts): 위험 12, 정상 8, 경계 4.
-- [첫 평가 도구](../../scripts/evaluate-holdout.ts)는 **작성 완료·실행 전**.
-- 이 문장들은 코드 구조를 확인한 후 수동으로 작성됐으므로 엄격한 독립/블라인드 검증 데이터는 아니다. **첫 평가 결과를 고정 기록하기 전에 규칙을 수정하지 않는다.**
+- [첫 평가 도구](../../scripts/evaluate-holdout.ts)를 **사용자 Ubuntu에서 실제 실행**. TP=4, FN=8, FP=4, TN=4, Recall=33.33%, FPR=50%. 12개 오류 기록은 [동결된 최초 평가 보고서](HOLDOUT-BASELINE-20261030.md).
+- 이 문장들은 코드 구조를 확인한 후 수동으로 작성됐으므로 엄격한 독립/블라인드 검증 데이터는 아니다. **최초 평가 결과는 수정 전에 문서로 동결했고, 05-5 규칙 개선에 사용한 뒤에는 이 문장들을 독립 검증 데이터라 부르지 않는다.**
+
+---
+
+### 05-4 실제 Ubuntu 신규 합성 평가 결과 — 2026-10-30
+
+사용자가 `git pull --ff-only origin main`으로 `fb5400b..79a894f`를 정상 동기화하고 `node --import tsx scripts/evaluate-holdout.ts`를 실행했다.
+
+| 항목 | 실측 | 판정 |
+|---|---:|---|
+| 전체 새 합성 사례 | 24건(위험 12/정상 8/경계 4) | 실행 PASS |
+| TP·FN | **4 · 8** | 탐지 누락 다수 |
+| FP·TN | **4 · 4** | 오경보 다수 |
+| 위험 재현율(Recall) | **33.33%** | **품질 FAIL** |
+| 정상 오경보율(FPR) | **50%** | **품질 FAIL** |
+
+미탐지: HS02 택배기사, HS03 수사기관, HS04 지원금 인증, HS05 거래처 계좌 변경, HS07 원격제어, HS08 안전결제, HS10 은행 비밀번호 요구, HS11 재배송 비용.
+
+오경보: HB02 청첩장 디자인, HB04 결제 교육, HB06 기관 사칭 메시지 분석, HB07 상품권 보안교육.
+
+**[05-4 최초 기준선 원본](HOLDOUT-BASELINE-20261030.md)을 반드시 유지한다.** 소수 합성 문구에 대한 결과이므로 실제 금융사기 탐지 정확도나 통계적 일반화 성능이 아니다.
+
+### 05-5 개선(코드 작성·로컬 시험 미실행)
+
+[문맥 기반 개선·회귀시험 문서](CONTEXT-IMPROVEMENT-05-5.md) 참고.
+
+- `src/lib/safety.ts`: 개인정보/금전 탈취 관련 **행동 요청 신호 8종**과 교육·설명 문맥 판별 휴리스틱 추가.
+- `tests/contextual-risk.test.ts`: 최초 오판 12건 + 문맥 위장·비밀번호 요구·긴급 안내 등을 포함한 **16개 신규 회귀시험** 작성.
+- **예상 전체 시험 49개(기존 33 + 신규 16)**. GitHub 작성 확인은 실제 Ubuntu TypeScript·테스트·빌드 PASS를 의미하지 않는다.
+- 기존 30건과 신규 24건 재평가 결과가 개선돼도 두 집합은 이제 개발·회귀시험용이며, **정식 독립 검증 데이터가 아니다**.
+- 다음 실제 검증 및 별도 신규/제3자 합성 데이터·대회 AI 기술 요건 확인 이후에만 품질 게이트 재평가.
 
 ---
 
@@ -229,9 +259,11 @@ node --import tsx scripts/evaluate-synthetic.ts
 - [x] **05-3c 개인정보·악성 입력 단위시험:** Ubuntu 실제 33/33 PASS 및 빌드 PASS
 - [x] **05-3c 로컬 HTTP 통합시험 8/8 PASS**: 실제 200·400·413·415·503 및 악성 지시 처리 확인([실측 기록](HTTP-INTEGRATION-20261030.md))
 - [ ] **실제 호스팅/프록시 로그·비밀정보 처리 확인** (아직 미수행)
+- [x] **05-4 새 합성 24건 최초 평가 실제 실행 및 기준선 동결** (품질 FAIL: FN=8, FP=4)
+- [ ] **05-5 문맥 개선 코드·신규 16개 회귀시험 작성, 사용자 Ubuntu 실제 실행 대기**
 - [ ] 공식 참가 대회 AI 기술·심사 요구사항 충족 여부 확인
 
-**현재 판정: 05-3c LOCAL_HTTP_INTEGRATION_PASS(8/8) / 05-4 HOLDOUT_EVALUATION_NOT_RUN / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 로컬 HTTP 조건은 통과했으나 외부 WAF 429·실제 호스팅 로그·비밀정보 점검은 미실행이며 공개 배포를 허용하지 않는다.
+**현재 판정: 05-3c LOCAL_HTTP_INTEGRATION_PASS(8/8) / 05-4 HOLDOUT_EXECUTED_QUALITY_FAIL / 05-5 REGRESSION_CODE_READY_NOT_RUN / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 신규 문장 탐지 성능이 낮아 공개 사용 부적합; 운영 WAF 429·호스팅 로그·정식 AI 조건 검증도 미완료.
 
 ## 05-1 실제 원격 실행 시도 — 환경 차단 기록
 
