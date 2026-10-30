@@ -28,7 +28,8 @@ export const EXAMPLE_MESSAGE =
 export function redactMessage(input: string): string {
   return input
     .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[이메일 가림]")
-    .replace(/(?<!\d)(?:\+?82[- ]?0?|0)1[016789][-\s]?\d{3,4}[-\s]?\d{4}(?!\d)/g, "[전화번호 가림]")
+    .replace(/(?<!\d)(?:\+?82[- .]?0?|0)1[016789][- .]?\d{3,4}[- .]?\d{4}(?!\d)/g, "[전화번호 가림]")
+    .replace(/(?<!\d)\d{6}[- ]\d{7}(?!\d)/g, "[신분번호 형식 가림]")
     .replace(/(?<!\d)\d{2,4}[- ]\d{2,6}[- ]\d{3,8}(?!\d)/g, "[번호 가림]")
     .replace(/(?<!\d)\d{10,16}(?!\d)/g, "[긴 숫자 가림]");
 }
