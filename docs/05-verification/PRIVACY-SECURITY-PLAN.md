@@ -1,6 +1,6 @@
 # 05-3c — 개인정보 및 악성 입력 보안 검증
 
-> 2026-10-30 · 상태: **정적 코드 개선·합성 단위시험 작성 / 사용자 Ubuntu 실행·실제 HTTP 보안시험 대기**
+> 2026-10-30 · 상태: **05-3c Ubuntu 33/33 단위시험·빌드 PASS / 실제 HTTP 통합시험·운영 로그 검증 대기**
 >
 > [05단계 보고서](README.md) · [04 구현](../04-implementation/README.md) · [프로젝트 홈](../../README.md)
 
@@ -20,13 +20,13 @@
 
 | 파일 | 개선·시험 내용 | 현재 |
 |---|---|---|
-| `src/lib/safety.ts` | 점으로 구분한 합성 휴대전화와 신분번호 모양 `6자리-7자리` 마스킹 추가 | 코드 반영, 재시험 대기 |
-| `tests/privacy-security.test.ts` | 휴대전화 점 표기·무효 신분번호 모양·가상 이메일/계좌 표기·원문 비반사·악성 명령·HTML 입력 총 6개 | 테스트 작성, **NOT_RUN** |
+| `src/lib/safety.ts` | 점으로 구분한 합성 휴대전화와 신분번호 모양 `6자리-7자리` 마스킹 추가 | **Ubuntu 단위시험 PASS** |
+| `tests/privacy-security.test.ts` | 휴대전화 점 표기·무효 신분번호 모양·가상 이메일/계좌 표기·원문 비반사·악성 명령·HTML 입력 총 6개 | **사용자 Ubuntu 실행 PASS(6/6)** |
 | `src/lib/request-guard.ts` | 8KiB 요청 크기 보호 | 단위 테스트 PASS, HTTP 통합 시험 대기 |
 | `src/app/api/analyze/route.ts` | 원문 요청은 서버에서 재마스킹하고 고정 사유/행동만 응답 | 소스 확인, 실제 로그·트래픽 감리 전 |
 | `src/lib/deployment-gate.ts` | 생산 환경 WAF 검증 전 분석 API를 503으로 거부 | 로컬 PASS / WAF 실제 미설정 |
 
-**테스트 총수 예상:** 기존 27개 + 신규 6개 = **33개**. 예상일 뿐이며 결과는 Ubuntu 실제 출력 후 기록한다.
+**실측:** 기존 27개 + 신규 6개 = **33개/33개 PASS**, fail=0. 사용자 Ubuntu 결과. 이는 HTTP 동적 시험을 대체하지 않는다.
 
 ## 3. 위험모델(Threat Model)과 검증 경계
 
@@ -55,11 +55,13 @@ npm run build || exit 1
 git status --short
 ~~~
 
-**예상:** 타입 검사 PASS, 자동 테스트 33개 PASS, 빌드 PASS. 결과는 실측 후에만 판정한다.
+**2026-10-30 실제 결과:** 타입 검사 PASS, 자동 테스트 33개 PASS, 빌드 PASS. 재실행은 필요 시에만 진행한다.
 
-## 5. 실제 API 동적 시험 — 다음 별도 단계(미실행)
+## 5. 실제 API 동적 시험 — 실행 스크립트 준비(미실행)
 
 개발 서버나 다른 작업 중인 포트를 건드리지 않도록 전용 테스트 포트를 사용한다.
+
+**실행 도구:** [`scripts/verify-http-security.py`](../../scripts/verify-http-security.py) — 사용자 Ubuntu에서 `python3 scripts/verify-http-security.py` 한 번 실행. 일반 개발 서버 3000번 대신 **127.0.0.1:3103**만 사용하고, 자신이 시작한 서버만 정리한다. 로컬 보호 검증 플래그는 한시적으로 적용되며 운영 WAF 인증을 의미하지 않는다.
 
 - `RATE_LIMIT_RULE_VERIFIED=false` 프로덕션: `POST /api/analyze` → 503(기존 실측 확인)
 - 시험용으로만 **로컬 프로덕션 서버**를 일시 `RATE_LIMIT_RULE_VERIFIED=true`로 실행: 정상 합성 JSON → 200, 잘못된 JSON → 400, 미지원 Content-Type → 415, 8KiB 초과 JSON → 413
@@ -71,10 +73,10 @@ git status --short
 
 - [x] 05-3b 사용자 Ubuntu 로컬 게이트 **27/27, 503 PASS** 기록
 - [x] 05-3c 마스킹 보완 코드 및 **신규 6개 합성 시험** GitHub 작성
-- [ ] 05-3c 사용자 Ubuntu TypeScript·33개 테스트·빌드 실제 PASS
+- [x] 05-3c 사용자 Ubuntu TypeScript·33개 테스트·빌드 실제 PASS
 - [ ] 로컬 HTTP 200/400/413/415 시험
 - [ ] 요청/응답·서버 로그·DOM 보안 점검
 - [ ] 실사용 임의 신규 합성 공격 시나리오 추가
 - [ ] 운영 WAF 429 및 모든 공개 엔드포인트 보호 확인
 
-**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c TESTS_READY / PUBLIC_DEPLOYMENT_BLOCKED.** 저장소의 정적 변경만으로 실운영 개인정보 보호 수준을 인증하지 않는다.
+**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c UNIT_AND_BUILD_PASS · HTTP_INTEGRATION_PENDING / PUBLIC_DEPLOYMENT_BLOCKED.** 실제 HTTP·WAF·호스팅 로그 검증 전에는 공개하지 않는다.
