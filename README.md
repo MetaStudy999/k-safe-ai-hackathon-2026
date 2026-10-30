@@ -48,7 +48,7 @@ ls -la
 | 02. 요구사항 | 기능·비기능·수용 기준 정의 | MVP 범위와 우선순위 확정 | **문서 PASS(공식 공고 확인 대기)** |
 | 03. 설계 | 화면·데이터·AI·보안 구조 | 사용자 흐름 및 개인정보 처리 검토 | **설계문서 PASS (실제 시험 미실행)** |
 | 04. 구현 | 웹앱·분석·추천 개발 | 핵심 시연 시나리오 실행 | **04-6 규칙 기반 MVP PASS(사용자 UI 5/5)** · LLM 미구현 |
-| 05. 검증 | 기능·AI·보안 테스트 | 기록된 시험 케이스 기준 통과 | **05-4 신규 합성 탐지 품질 FAIL, 05-5 문맥 개선 코드·시험 작성(실행 대기)** |
+| 05. 검증 | 기능·AI·보안 테스트 | 기록된 시험 케이스 기준 통과 | **05-5 49/49·회귀평가·빌드 PASS, 05-6 새 데이터 독립평가 대기** |
 | 06. 배포 | 접근 가능한 데모 공개 | HTTPS URL 접속·동작 확인 | 예정 |
 | 07. 운영 | 장애·비용·오류 관리 | 운영 및 장애 대응 점검 | 예정 |
 | 08. 발표 | 시연·증빙·사회적 효과 발표 | 발표자료·리허설·예비 영상 준비 | 예정 |
@@ -63,7 +63,7 @@ ls -la
 
 **04단계 자료:** [구현 현황·Node24·설치/시험 방법](docs/04-implementation/README.md)
 
-**05단계 자료:** [종합 검증·합성 30개 평가·보안 위험](docs/05-verification/README.md) · [05-1 실제 측정 기준선](docs/05-verification/BASELINE-20261030.md) · [05-2 개선 후 실제 측정 기록](docs/05-verification/POSTFIX-20261030.md) · [05-3b 요청률 제한 설정](docs/05-verification/RATE-LIMIT-SETUP.md) · [05-3c 개인정보·악성 입력 검증](docs/05-verification/PRIVACY-SECURITY-PLAN.md) · [05-3c 로컬 HTTP 보안 검사 스크립트](scripts/verify-http-security.py) · [05-3c 실제 HTTP 8/8 결과](docs/05-verification/HTTP-INTEGRATION-20261030.md) · [05-4 배포 전 승인 기준](docs/05-verification/PREDEPLOY-GATE.md) · [05-4 신규 합성 평가](scripts/evaluate-holdout.ts) · [05-4 최초 실측 기준선](docs/05-verification/HOLDOUT-BASELINE-20261030.md) · [05-5 문맥 개선 설계](docs/05-verification/CONTEXT-IMPROVEMENT-05-5.md)
+**05단계 자료:** [종합 검증·합성 30개 평가·보안 위험](docs/05-verification/README.md) · [05-1 실제 측정 기준선](docs/05-verification/BASELINE-20261030.md) · [05-2 개선 후 실제 측정 기록](docs/05-verification/POSTFIX-20261030.md) · [05-3b 요청률 제한 설정](docs/05-verification/RATE-LIMIT-SETUP.md) · [05-3c 개인정보·악성 입력 검증](docs/05-verification/PRIVACY-SECURITY-PLAN.md) · [05-3c 로컬 HTTP 보안 검사 스크립트](scripts/verify-http-security.py) · [05-3c 실제 HTTP 8/8 결과](docs/05-verification/HTTP-INTEGRATION-20261030.md) · [05-4 배포 전 승인 기준](docs/05-verification/PREDEPLOY-GATE.md) · [05-4 신규 합성 평가](scripts/evaluate-holdout.ts) · [05-4 최초 실측 기준선](docs/05-verification/HOLDOUT-BASELINE-20261030.md) · [05-5 문맥 개선 설계](docs/05-verification/CONTEXT-IMPROVEMENT-05-5.md) · [05-5 실제 PASS 보고서](docs/05-verification/CONTEXT-RESULT-05-5-20261030.md) · [05-6 외부 작성 평가 방법](docs/05-verification/BLIND-EVALUATION-05-6.md)
 
 ## 3. 최소기능제품 (MVP) 범위
 
@@ -136,4 +136,4 @@ docs/
 
 ---
 
-**프로젝트 상태:** 00 초기화 PASS · 01 기획 문서 PASS(대회 규정 대기) · 02 요구사항 문서 PASS · 03 설계 문서 PASS · **04-6 규칙 기반 MVP PASS, LLM 미구현** · **05-3c 33/33 자동 테스트·HTTP 8/8 PASS** · **05-4 사용자 Ubuntu 신규 합성 24건 실행, 위험 12건 중 8건 미탐지·정상 8건 중 4건 오경보(품질 FAIL)** · **05-5 문맥 보완 코드·16개 회귀시험 작성(실행 대기)** · WAF 429/호스팅 로그/AI 규정 미검증, 공개 배포 보류.
+**프로젝트 상태:** 00 초기화 PASS · 01 기획 문서 PASS(대회 규정 대기) · 02 요구사항 문서 PASS · 03 설계 문서 PASS · **04-6 규칙 기반 MVP PASS, LLM 미구현** · **05-3c 33/33 자동 테스트·HTTP 8/8 PASS** · **05-4 최초 신규 24건 품질 FAIL(FN=8, FP=4), 05-5 개선 후 49/49 회귀시험·동일 데이터 재평가·빌드 PASS** · **05-6 별도 작성 합성 데이터 평가 도구 준비(데이터 미수령·실행 대기)** · 실제 WAF 429/호스팅 로그/AI 규정 미검증, 공개 배포 보류.
