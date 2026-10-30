@@ -1,6 +1,6 @@
 export type Situation = "before_transfer" | "already_transferred" | "installed_app" | "unsure";
 export type RiskLevel = "warning" | "review" | "no_clear_signal";
-export type SignalId = "upfront_payment" | "unverified_app_install" | "urgent_pressure" | "impersonation";
+export type SignalId = "upfront_payment" | "unverified_app_install" | "urgent_pressure" | "impersonation" | "family_contact_scam" | "gift_card_pin_request" | "urgent_transfer_request";
 export type AnalysisResult = {
   risk_level: RiskLevel;
   signals: SignalId[];
@@ -37,10 +37,13 @@ const signalRules: { id: SignalId; reason: string; pattern: RegExp }[] = [
   { id: "upfront_payment", reason: "대출·환급을 위해 선입금이나 상환을 먼저 요구합니다.", pattern: /(선입금|먼저\s*(?:송금|입금|상환)|상환금|수수료.{0,8}(입금|송금))/i },
   { id: "unverified_app_install", reason: "별도 앱 설치를 유도하고 있습니다.", pattern: /(앱|어플|apk|애플리케이션).{0,12}(설치|다운로드)|(설치|다운로드).{0,12}(앱|어플|apk)/i },
   { id: "urgent_pressure", reason: "즉시 행동하도록 압박하는 표현이 있습니다.", pattern: /(지금\s*바로|즉시|당장|오늘\s*안에|계정.{0,8}(정지|차단))/i },
-  { id: "impersonation", reason: "금융회사 또는 공공기관을 사칭할 가능성이 있습니다.", pattern: /(금융감독원|경찰청|검찰청|공공기관|은행\s*담당자|금융회사\s*담당자)/i }
+  { id: "impersonation", reason: "금융회사 또는 공공기관을 사칭할 가능성이 있습니다.", pattern: /(금융감독원|경찰청|검찰청|공공기관|은행\s*담당자|금융회사\s*담당자)/i },
+  { id: "family_contact_scam", reason: "가족인 것처럼 연락하며 휴대전화 문제를 핑계로 돈이나 상품권을 요구합니다. 가족의 기존 번호로 따로 확인하세요.", pattern: /(?=[\s\S]*(?:엄마|아빠|어머니|아버지|딸|아들))(?=[\s\S]*(?:휴대폰|핸드폰|폰|액정|전화번호))(?=[\s\S]*(?:고장|깨져|수리|이\s*번호|새\s*번호|번호\s*바꿨))(?=[\s\S]*(?:송금|이체|입금|상품권|핀\s*번호|돈|계좌))[\s\S]*/i },
+  { id: "gift_card_pin_request", reason: "상품권·기프트카드의 PIN 번호나 코드를 전달해 달라는 요청입니다.", pattern: /(?:문화\s*상품권|상품권|기프트\s*카드|모바일\s*쿠폰).{0,80}(?:핀\s*번호|PIN\s*번호|기프트\s*코드|코드|번호|카톡|보내)|(?:핀\s*번호|PIN\s*번호|기프트\s*코드).{0,40}(?:보내|전송|알려)/i },
+  { id: "urgent_transfer_request", reason: "급한 상황을 내세워 계좌이체·송금 등을 요구합니다.", pattern: /(?:급하게|급히|빨리|당장|지금).{0,55}(?:이체|송금|입금|돈.{0,8}보내|계좌.{0,12}보내)|(?:이체|송금|입금).{0,40}(?:급해|급합니다|빨리|지금)/i }
 ];
 
-export function getActions(situation: Situation): string[] {
+export function getActions(situation: Situation, signals: SignalId[] = []): string[] {
   if (situation === "already_transferred") {
     return [
       "AI 분석을 기다리지 말고 즉시 112와 거래 금융회사에 연락해 피해 신고·지급정지를 문의하세요.",
@@ -53,6 +56,13 @@ export function getActions(situation: Situation): string[] {
       "의심 앱에서 로그인·인증·송금을 하지 마세요.",
       "안전한 다른 기기로 금융회사에 직접 연락하고, 스미싱 상담은 118에 문의하세요.",
       "금전 피해가 의심된다면 112와 금융회사에 즉시 연락하세요."
+    ];
+  }
+  if (signals.includes("family_contact_scam") || signals.includes("gift_card_pin_request")) {
+    return [
+      "송금하거나 상품권·PIN 번호·인증번호를 전달하지 마세요.",
+      "가족이 이전부터 사용하던 번호로 직접 통화하여 요청을 확인하세요.",
+      "새 번호로 연락하라는 문자만 믿지 말고, 확인이 어려우면 118 등 공식 상담 창구에 문의하세요."
     ];
   }
   return [
@@ -70,7 +80,7 @@ export function analyzeMessage(message: string, situation: Situation): AnalysisR
     signals,
     reasons: matches.length > 0 ? matches.map((rule) => rule.reason) : ["사전 정의된 규칙에서 명확한 위험 신호를 찾지 못했습니다. 이것이 안전하다는 뜻은 아닙니다."],
     uncertainty_notice: "이 결과만으로 사기 여부를 확정할 수 없습니다. 공식 경로로 직접 확인하세요.",
-    recommended_actions: getActions(situation),
+    recommended_actions: getActions(situation, signals),
     source: "rules_fallback",
     analysis_status: "fallback"
   };
