@@ -1,6 +1,6 @@
 # 05단계 — 종합 검증 (Verification & Validation)
 
-> 2026-10-30 · 버전 v1.6 · **05-3b Ubuntu 27/27·빌드·HTTP 503 로컬 PASS / 05-3c 마스킹 보완 및 보안 시험 6개 작성·실행 대기**
+> 2026-10-30 · 버전 v1.7 · **05-3b 로컬 503 PASS / 05-3c Ubuntu 33/33 자동 테스트·빌드 PASS / HTTP 통합 검증 대기**
 >
 > [프로젝트 홈](../../README.md) · [04 구현 기록](../04-implementation/README.md) · [02 요구사항](../02-requirements/README.md) · [03 보안 설계](../03-design/README.md)
 
@@ -179,6 +179,18 @@ node --import tsx scripts/evaluate-synthetic.ts
 - 요청/응답·오류 로그·실제 HTTP 400·413·415, 운영 WAF 429는 **미검증**.
 - 개인 정보 정규식 가림은 전면적 민감정보 탐지나 익명화를 보장하지 않는다. 실제 민감정보 입력 금지 정책 유지.
 
+### 05-3c 실제 사용자 Ubuntu 검증 기록 — 2026-10-30
+
+사용자 제공 로그에서 `main` 커밋 `434814d..967c559` **fast-forward**, `npm run typecheck` PASS, `npm test` **33/33 PASS, fail=0, skipped=0**, `npm run build` Next.js 16.4.3 컴파일 및 정적 페이지 4/4 **PASS**가 확인됐다.
+
+6개의 신규 개인정보·악성 입력 단위시험(점 구분 합성 전화번호, 무효 신분번호 형식, 이메일·계좌형 번호, 입력 미반사, 악성 지시 대응, HTML 입력 미반사)이 모두 통과했다. **서버 통합 HTTP·보안 공격 시험과는 구별해야 한다.**
+
+**05-3c 실제 HTTP 통합검증 준비:** [`scripts/verify-http-security.py`](../../scripts/verify-http-security.py)를 추가했다. 이 스크립트는 **127.0.0.1:3103 루프백(Loopback) 전용**으로 서버를 잠깐 실행하여 생산 환경의 503 보호 게이트, 로컬 시험 조건의 200·400·413·415, 악성 문자 입력 미반사를 확인하고 자신이 만든 서버를 종료한다. `RATE_LIMIT_RULE_VERIFIED=true`는 **로컬 시험 서버에서만 임시 적용**한다. 실제 운영용 방화벽 구성이나 공개 배포 승인이 아니다.
+
+**아직 미실행:** 위 HTTP 통합 스크립트, 호스팅 로그 점검, WAF의 429/요청 제한 실증. 사용자 로컬 작업물 `next-env.d.ts`와 `package-lock.json`은 변경 없이 보존해야 한다.
+
+---
+
 ## 4. 개선 우선순위
 
 1. **P0 배포 차단:** 공개 API 요청 제한·최대 HTTP 본문 크기 검사; 실제 민감정보 입력/로그 최소화 정책을 명확히 하고 동적 시험.
@@ -196,10 +208,11 @@ node --import tsx scripts/evaluate-synthetic.ts
 - [x] **05-3a** 요청 본문 8KiB 상한 단위시험 PASS, 실제 HTTP 413 검증 필요
 - [x] **05-3b 로컬 보호 게이트 시험 PASS:** TypeScript PASS, 27/27 자동 테스트, 프로덕션 빌드 PASS, GET / 정상, POST /api/analyze HTTP 503
 - [ ] **05-3b 실제 WAF 설정 및 429 응답 검증**(미구성, 공개 배포 차단 유지)
-- [ ] **05-3c 개인정보·악성 입력 시험:** 보완 코드·6개 시험 작성 완료, Ubuntu 실제 실행 및 로그 점검 대기
+- [x] **05-3c 개인정보·악성 입력 단위시험:** Ubuntu 실제 33/33 PASS 및 빌드 PASS
+- [ ] **05-3c 실제 HTTP 통합시험·서버 로그 점검**: 실행 도구 작성·동적 검증 대기
 - [ ] 공식 참가 대회 AI 기술·심사 요구사항 충족 여부 확인
 
-**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c TESTS_READY·NOT_RUN / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 실제 개인정보·HTTP 동적 시험 및 WAF 429 검증 전에는 공개 배포하지 않는다.
+**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c UNIT_AND_BUILD_PASS, HTTP_INTEGRATION_PENDING / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 실제 HTTP 요청 검증·호스팅 로그·WAF 429 검증 전에는 공개 배포하지 않는다.
 
 ## 05-1 실제 원격 실행 시도 — 환경 차단 기록
 
