@@ -109,3 +109,9 @@ Playwright Chromium이 없는 새 환경에서는 `npx playwright install chromi
 - 기준 커밋: `2431c0c` (`test: prepare independent blind evaluation tooling`). 이번 변경은 미커밋 상태다.
 - 기존 미커밋 변경을 보존했고 main push, force push, 기존 작업 삭제, GitHub 원격 변경, Vercel 배포는 하지 않았다.
 - 공개 합성 데모의 로컬 검증은 완료되어 변경 검토 및 GitHub/배포 단계로 넘길 수 있다. 외부 배포 확인과 WAF 검증은 이번 완료 범위에 포함하지 않는다.
+
+## 후속 배포 준비 업데이트 (2026-10-30)
+
+사용자가 기존 Vercel 도메인 `https://k-safe-ai-hackathon-2026.vercel.app/`에 배포를 요청했다. 새 프로젝트를 생성하지 않고 기존 프로젝트 `prj_Q1VmxcQCRImPHiGadWqFgvnZklYR`을 확인했다.
+
+원격 main에 이후 추가된 `3e6f374`의 공개 데모 보호 코드를 병합했다. `sample`/`signals` 공개 시나리오 계약과 `tests/public-demo.test.ts`를 유지하며, 개발 환경의 기본 `/`는 원격 main과 동일한 기존 분석기이고 Production `/`는 이번 원본 기반 공개 UI다. `/lab`도 개발 환경에서만 유지된다. 병합 후 타입 검사·65개 단위 테스트·Production 빌드를 다시 통과했다. 실제 배포 URL과 외부 검증 결과는 배포 완료 보고서에 별도로 기록한다.

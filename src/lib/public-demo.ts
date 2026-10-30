@@ -1,6 +1,6 @@
 import { getActions, type Situation } from "./safety";
 
-export const PUBLIC_DEMO_SCENARIOS = [
+const REFERENCE_SCENARIOS = [
   {
     id: "before_transfer",
     label: "송금 전",
@@ -123,6 +123,16 @@ export const PUBLIC_DEMO_SCENARIOS = [
   alertText: string;
   steps: readonly string[];
 }[];
+
+// Preserve the public scenario contract introduced on main while enriching it
+// with the fields required by the approved reference-based UI.
+export const PUBLIC_DEMO_SCENARIOS = REFERENCE_SCENARIOS.map((scenario) => ({
+  ...scenario,
+  sample: scenario.message,
+  signals: scenario.clues.map((clue) => clue.title),
+}));
+
+export type PublicDemoScenario = (typeof PUBLIC_DEMO_SCENARIOS)[number];
 
 export function getPublicDemoActions(situation: Situation): string[] {
   const actions = getActions(situation);
