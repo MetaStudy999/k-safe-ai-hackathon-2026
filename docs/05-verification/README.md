@@ -1,6 +1,6 @@
 # 05단계 — 종합 검증 (Verification & Validation)
 
-> 2026-10-30 · 버전 v1.5 · **05-3a Ubuntu 24/24 PASS / 05-3b Ubuntu 27/27·빌드·HTTP 503 로컬 PASS / 05-3c 개인정보·악성 입력 검증 준비**
+> 2026-10-30 · 버전 v1.6 · **05-3b Ubuntu 27/27·빌드·HTTP 503 로컬 PASS / 05-3c 마스킹 보완 및 보안 시험 6개 작성·실행 대기**
 >
 > [프로젝트 홈](../../README.md) · [04 구현 기록](../04-implementation/README.md) · [02 요구사항](../02-requirements/README.md) · [03 보안 설계](../03-design/README.md)
 
@@ -171,6 +171,14 @@ node --import tsx scripts/evaluate-synthetic.ts
 
 ---
 
+### 05-3c 개인정보·악성 입력 보안 검증 준비
+
+- [05-3c 검증 문서](PRIVACY-SECURITY-PLAN.md)를 작성.
+- 전화번호 점 구분, 가상의 신분번호 형식에 대한 마스킹 보완 및 **6개 신규 합성 보안 테스트** 작성.
+- 기존 **27개**에 신규 **6개**를 합한 **33개 자동 테스트를 사용자 Ubuntu에서 실행할 예정**. 아직 테스트 PASS 아님.
+- 요청/응답·오류 로그·실제 HTTP 400·413·415, 운영 WAF 429는 **미검증**.
+- 개인 정보 정규식 가림은 전면적 민감정보 탐지나 익명화를 보장하지 않는다. 실제 민감정보 입력 금지 정책 유지.
+
 ## 4. 개선 우선순위
 
 1. **P0 배포 차단:** 공개 API 요청 제한·최대 HTTP 본문 크기 검사; 실제 민감정보 입력/로그 최소화 정책을 명확히 하고 동적 시험.
@@ -188,10 +196,10 @@ node --import tsx scripts/evaluate-synthetic.ts
 - [x] **05-3a** 요청 본문 8KiB 상한 단위시험 PASS, 실제 HTTP 413 검증 필요
 - [x] **05-3b 로컬 보호 게이트 시험 PASS:** TypeScript PASS, 27/27 자동 테스트, 프로덕션 빌드 PASS, GET / 정상, POST /api/analyze HTTP 503
 - [ ] **05-3b 실제 WAF 설정 및 429 응답 검증**(미구성, 공개 배포 차단 유지)
-- [ ] 개인정보·로그·인젝션 시험
+- [ ] **05-3c 개인정보·악성 입력 시험:** 보완 코드·6개 시험 작성 완료, Ubuntu 실제 실행 및 로그 점검 대기
 - [ ] 공식 참가 대회 AI 기술·심사 요구사항 충족 여부 확인
 
-**현재 판정: 05-3a UNIT_AND_BUILD_PASS / 05-3b LOCAL_GATE_PASS, WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 실제 WAF 429 및 개인정보·HTTP 동적 보안 검증 전에는 공개 배포하지 않는다.
+**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c TESTS_READY·NOT_RUN / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 실제 개인정보·HTTP 동적 시험 및 WAF 429 검증 전에는 공개 배포하지 않는다.
 
 ## 05-1 실제 원격 실행 시도 — 환경 차단 기록
 
