@@ -45,7 +45,7 @@
 
 ## 2. 핵심 사용자 흐름
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     A["의심 문자 입력 또는 예시 선택"] --> B["현재 상황 선택"]
     B --> C{"이미 송금했는가?"}
@@ -58,7 +58,7 @@ flowchart TD
     H --> I["위험 근거 + 불확실성 표시"]
     I --> J["상황별 다음 안전행동 추천"]
     J --> K["공식 확인·신고 경로 안내"]
-\`\`\`
+```
 
 ※ '이미 송금' 안내는 네트워크·LLM을 거치지 않고 즉시 보여준다. AI 설명이 실패하거나 지연되면 규칙 기반 결과로 대체한다.
 
@@ -103,7 +103,7 @@ flowchart TD
 | ID | 위험 | 필수 통제와 수용 기준 | 시험 ID |
 |---|---|---|---|
 | **SR-01** | 민감정보 외부 전송 | AI API 요청 직전 서버 측에서도 개인정보 가림을 검사. **정규식만으로 모든 개인정보를 완벽히 탐지한다고 주장하지 않음.** 실제 데이터 입력을 지양하도록 고지 | TS-01 |
-| **SR-02** | API 비밀키 유출 | API 키는 서버 환경변수로만 보관. \`.env\`·비밀키·로그의 저장소 커밋 금지. 클라이언트 응답에 비밀키 미포함 | TS-02 |
+| **SR-02** | API 비밀키 유출 | API 키는 서버 환경변수로만 보관. `.env`·비밀키·로그의 저장소 커밋 금지. 클라이언트 응답에 비밀키 미포함 | TS-02 |
 | **SR-03** | 프롬프트 인젝션 | 사용자가 붙여넣은 문구는 지시사항이 아닌 비신뢰 데이터. '이전 지침 무시'를 포함해도 우선 안전 규칙·안내 유지 | TS-03 |
 | **SR-04** | 악성 URL/SSRF | 사용자가 넣은 외부 URL은 렌더링 시 클릭 가능한 자동 링크로 만들지 않고 **서버에서 자동 방문하지 않음**. 허용된 공식 링크만 별도 제공 | TS-04 |
 | **SR-05** | 로그·보관 | 원본 메시지·민감정보·AI 전달 원문을 로그·분석 서비스에 저장하지 않도록 설계. 해커톤에서는 영구 저장소 불필요 | TS-05 |
@@ -118,18 +118,18 @@ flowchart TD
 
 **입력 예시 — 모두 합성 자료**
 
-\`\`\`json
+```json
 {
   "message": "저금리 전환을 위해 먼저 상환금을 보내고 전용 앱을 설치하세요.",
   "situation": "before_transfer"
 }
-\`\`\`
+```
 
-**상황 열거형:** \`before_transfer\`(송금 전), \`already_transferred\`(이미 송금), \`installed_app\`(앱 설치), \`unsure\`(잘 모르겠음).
+**상황 열거형:** `before_transfer`(송금 전), `already_transferred`(이미 송금), `installed_app`(앱 설치), `unsure`(잘 모르겠음).
 
 **출력 예시 — 예상 구조**
 
-\`\`\`json
+```json
 {
   "risk_level": "warning",
   "signals": ["upfront_payment", "unverified_app_install"],
@@ -142,11 +142,11 @@ flowchart TD
   "source": "rules_with_ai_explanation",
   "analysis_status": "completed"
 }
-\`\`\`
+```
 
-- 위험 수준 후보: \`warning\`, \`review\`, \`no_clear_signal\` (마지막은 '**안전 확인**'을 뜻하지 않음).
-- 출처 후보: \`rules_with_ai_explanation\`, \`rules_fallback\`.
-- AI 실패 시 \`analysis_status\`를 오류/대체 상태로 정확히 표시한다.
+- 위험 수준 후보: `warning`, `review`, `no_clear_signal` (마지막은 '**안전 확인**'을 뜻하지 않음).
+- 출처 후보: `rules_with_ai_explanation`, `rules_fallback`.
+- AI 실패 시 `analysis_status`를 오류/대체 상태로 정확히 표시한다.
 - 우선 긴급 연락 안내는 **클라이언트 화면에서 즉시 제공**하고, 응답 데이터에 의존하지 않는다.
 - 원문 메시지와 개인정보를 결과 JSON에 되돌려 보내지 않는 것을 원칙으로 한다.
 
@@ -228,4 +228,4 @@ flowchart TD
 6. 배포 설계: HTTPS, 비밀키 서버 보관, 개인정보 원문 로그 미수집, 요청 제한.
 7. 대회 조건 미확정: 참가할 해커톤 공식 공고 확인 후 평가 가중치·필수 제출물 조정.
 
-**다음 작업 파일:** \`docs/03-design/README.md\` (아직 생성하지 않음).
+**다음 작업 파일:** `docs/03-design/README.md` (아직 생성하지 않음).
