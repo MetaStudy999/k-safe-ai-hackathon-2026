@@ -1,6 +1,6 @@
 # 05단계 — 종합 검증 (Verification & Validation)
 
-> 2026-10-30 · 버전 v1.7 · **05-3b 로컬 503 PASS / 05-3c Ubuntu 33/33 자동 테스트·빌드 PASS / HTTP 통합 검증 대기**
+> 2026-10-30 · 버전 v1.8 · **05-3c Ubuntu 33/33·빌드·HTTP 8/8 PASS / 05-4 신규 합성 평가 준비 / 운영 WAF 미검증**
 >
 > [프로젝트 홈](../../README.md) · [04 구현 기록](../04-implementation/README.md) · [02 요구사항](../02-requirements/README.md) · [03 보안 설계](../03-design/README.md)
 
@@ -191,6 +191,24 @@ node --import tsx scripts/evaluate-synthetic.ts
 
 ---
 
+### 05-3c 실제 로컬 HTTP 통합시험 — 사용자 Ubuntu 증거
+
+- Git fast-forward: `967c559..fb5400b` 정상 반영.
+- `python3 scripts/verify-http-security.py` 실제 실행 완료.
+- **8/8 PASS:** 메인 GET 200, 보호 미검증 API 503, 가상 정상 요청 200, 잘못된 JSON 400, 미지원 형식 415, 8KiB 초과 413, 2,000자 초과 400, 악성 지시 입력 200 및 기본 안전 권고 유지.
+- 상세 관측 근거는 [HTTP 보안 통합시험 실측 문서](HTTP-INTEGRATION-20261030.md)를 참고.
+- **범위 한계:** 호스팅/프록시 로그, 분산 WAF 요청률 제한, 429, 대규모 DoS 방어 및 모든 악성 입력 방어를 검증한 것은 아니다.
+- 로컬 작업물 `M next-env.d.ts` 및 `?? package-lock.json`은 그대로 보존.
+
+### 05-4 신규 합성 평가(다음 작업)
+
+- [배포 전 보안 승인표](PREDEPLOY-GATE.md) 작성. G04 외부 WAF 미설정으로 공개 배포 **BLOCK** 유지.
+- [새 합성 사례 24개](../../data/synthetic/holdout-20261030.ts): 위험 12, 정상 8, 경계 4.
+- [첫 평가 도구](../../scripts/evaluate-holdout.ts)는 **작성 완료·실행 전**.
+- 이 문장들은 코드 구조를 확인한 후 수동으로 작성됐으므로 엄격한 독립/블라인드 검증 데이터는 아니다. **첫 평가 결과를 고정 기록하기 전에 규칙을 수정하지 않는다.**
+
+---
+
 ## 4. 개선 우선순위
 
 1. **P0 배포 차단:** 공개 API 요청 제한·최대 HTTP 본문 크기 검사; 실제 민감정보 입력/로그 최소화 정책을 명확히 하고 동적 시험.
@@ -209,10 +227,11 @@ node --import tsx scripts/evaluate-synthetic.ts
 - [x] **05-3b 로컬 보호 게이트 시험 PASS:** TypeScript PASS, 27/27 자동 테스트, 프로덕션 빌드 PASS, GET / 정상, POST /api/analyze HTTP 503
 - [ ] **05-3b 실제 WAF 설정 및 429 응답 검증**(미구성, 공개 배포 차단 유지)
 - [x] **05-3c 개인정보·악성 입력 단위시험:** Ubuntu 실제 33/33 PASS 및 빌드 PASS
-- [ ] **05-3c 실제 HTTP 통합시험·서버 로그 점검**: 실행 도구 작성·동적 검증 대기
+- [x] **05-3c 로컬 HTTP 통합시험 8/8 PASS**: 실제 200·400·413·415·503 및 악성 지시 처리 확인([실측 기록](HTTP-INTEGRATION-20261030.md))
+- [ ] **실제 호스팅/프록시 로그·비밀정보 처리 확인** (아직 미수행)
 - [ ] 공식 참가 대회 AI 기술·심사 요구사항 충족 여부 확인
 
-**현재 판정: 05-3b LOCAL_GATE_PASS / 05-3c UNIT_AND_BUILD_PASS, HTTP_INTEGRATION_PENDING / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 실제 HTTP 요청 검증·호스팅 로그·WAF 429 검증 전에는 공개 배포하지 않는다.
+**현재 판정: 05-3c LOCAL_HTTP_INTEGRATION_PASS(8/8) / 05-4 HOLDOUT_EVALUATION_NOT_RUN / WAF_NOT_CONFIGURED / 05-IN_PROGRESS / DEPLOYMENT_BLOCKED.** 로컬 HTTP 조건은 통과했으나 외부 WAF 429·실제 호스팅 로그·비밀정보 점검은 미실행이며 공개 배포를 허용하지 않는다.
 
 ## 05-1 실제 원격 실행 시도 — 환경 차단 기록
 
