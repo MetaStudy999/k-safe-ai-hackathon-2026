@@ -13,5 +13,7 @@
   "human_label_review": "REQUIRED",
   "independence_review": "REQUIRED",
   "evaluation": "NOT_RUN",
-  "formal_independent_quality_pass": false
+  "formal_independent_quality_pass": false,
+  "meets_05_6_separate_human_author_requirement": false,
+  "allowed_use": "AI-authored exploratory candidates; not a replacement for independently human-authored evaluation data"
 }

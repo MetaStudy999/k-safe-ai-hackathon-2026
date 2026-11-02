@@ -40,7 +40,8 @@ category 2~80자, message 10~160자로 작성하세요. 위험 후보는 금전�
     source_code_commit_frozen_before_generation: frozenCode, classifier_sha256: classifierHash,
     data_sha256: createHash("sha256").update(raw).digest("hex"), sample_size: 24, counts: checked.counts,
     human_label_review: "REQUIRED", independence_review: "REQUIRED", evaluation: "NOT_RUN",
-    formal_independent_quality_pass: false };
+    formal_independent_quality_pass: false, meets_05_6_separate_human_author_requirement: false,
+    allowed_use: "AI-authored exploratory candidates; not a replacement for independently human-authored evaluation data" };
   await writeFile("artifacts/evaluation/provenance.json", JSON.stringify(provenance, null, 2) + "\n");
   console.log(JSON.stringify(provenance, null, 2));
 }
