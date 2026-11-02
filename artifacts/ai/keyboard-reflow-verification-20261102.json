@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-11-02T04:00:22.489Z",
+  "source_commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+  "keyboard_tab_to_textarea": true,
+  "keyboard_radio_arrow_changes_situation": true,
+  "keyboard_tab_to_analyze": true,
+  "focus_outline": {
+    "style": "solid",
+    "width": "3px"
+  },
+  "reflow_css_viewports": [
+    {
+      "viewport": 320,
+      "document": 320,
+      "heading": 288
+    },
+    {
+      "viewport": 640,
+      "document": 640,
+      "heading": 608
+    }
+  ],
+  "zoom_scope": "640 CSS-pixel viewport models reflow at 200% of a 1280px desktop; native browser zoom and every assistive technology not tested.",
+  "analysis_post_requests": 0
+}

@@ -21,7 +21,7 @@
 | AI 입력 | 상황과 서버가 정한 위험 신호·고정 설명 | 메시지 원문·가림문·사용자 명령은 전송하지 않음 |
 | 안전 행동 | 기존 규칙이 결정·AI 오류에도 유지 | AI 판정·자동 금융 조치 없음 |
 | 자동 검사 | 타입·74개 테스트·프로덕션 빌드 PASS | 모의 AI 검사와 실제 호출을 분리 |
-| 실제 흐름 | 브라우저→개발 API→실제 AI→화면 PASS | 합성 예시의 기능 확인 |
+| 실제 흐름 | 고정 커밋 브라우저→개발 API→실제 AI→화면 PASS | 실제 전송 본문 3건·추가 개발 UI 9항목 확인 |
 | 공개 HTTP | 로컬 production / 200, /lab 404, 분석 POST 503 | 운영 주소의 버전은 배포 영수증과 대조 |
 | 독립 탐지 품질 | 사람의 자료·라벨 검토 대기 | 시험 수를 탐지 정확도로 주장하지 않음 |
 | 공식 대회 요건 | 실제 공고·기한 미확정 | 다른 대회 자료는 참고용 |
@@ -35,7 +35,7 @@
 3. 개발 화면에서는 가상 예시를 불러오고 실제 AI 보조 설명을 확인합니다.
 4. AI 연결 실패 시에도 규칙 근거·긴급 행동이 유지되는 것을 확인합니다.
 
-[발표 PDF](docs/08-presentation/K-SAFE-MVP-20261102.pdf) · [편집 가능한 PPTX](docs/08-presentation/K-SAFE-MVP-20261102.pptx) · [시연 대본·예비 시연](docs/08-presentation/DEMO-SCRIPT-20261102.md) · [발표 디자인 가이드](docs/08-presentation/K-SAFE-SLIDE-DESIGN-SYSTEM.md)
+[공개판 시연 녹화](docs/08-presentation/PUBLIC-DEMO-PLAYER-20261102.html) · [발표 PDF](docs/08-presentation/K-SAFE-MVP-20261102.pdf) · [편집 가능한 PPTX](docs/08-presentation/K-SAFE-MVP-20261102.pptx) · [시연 대본·예비 시연](docs/08-presentation/DEMO-SCRIPT-20261102.md) · [발표 디자인 가이드](docs/08-presentation/K-SAFE-SLIDE-DESIGN-SYSTEM.md)
 
 ## 로컬 재현
 
@@ -66,6 +66,12 @@ AI 검증·공개 설명 재생성은 필요할 때만 명시적으로 실행합
 ```bash
 node scripts/with-existing-key.mjs verify /path/to/approved-existing.env
 node scripts/with-existing-key.mjs generate /path/to/approved-existing.env
+```
+
+실제 전송 본문을 검사하며 합성 입력 3건을 호출하는 추가 도구도 있습니다. API 키·본문·모델 응답 전문은 출력·저장하지 않으며 실제 API 비용이 발생합니다.
+
+```bash
+node scripts/with-existing-key.mjs wire /path/to/approved-existing.env
 ```
 
 현재 모델은 `gpt-6-luna`입니다. 로컬 실행당 최대 24회·동시 1회·8초 제한·재시도 0을 적용합니다. 이 장치는 재시작·여러 프로세스에 걸친 전역 예산이나 운영 WAF를 대신하지 않습니다. `store=false`와 SDK telemetry 비활성화가 제공자의 모든 보관 정책을 면제하지는 않습니다.
@@ -114,6 +120,7 @@ flowchart TB
 - [요구사항](docs/02-requirements/README.md) · [설계](docs/03-design/README.md) · [구현 이력](docs/04-implementation/README.md)
 - [검증 이력](docs/05-verification/README.md) · [최신 구현·검증 대응표](docs/05-verification/MVP-20261102.md)
 - [독립 평가 절차](docs/05-verification/BLIND-EVALUATION-05-6.md) · [평가자 안내](docs/05-verification/BLIND-EVALUATOR-GUIDE-05-6.md)
+- [배포 범위·원격 검사 조건](docs/06-deployment/README.md) · [로컬 시연 운영·장애 대응](docs/07-operations/README.md)
 - [시연 대본](docs/08-presentation/DEMO-SCRIPT-20261102.md) · [발표 디자인 가이드](docs/08-presentation/K-SAFE-SLIDE-DESIGN-SYSTEM.md)
 
 과거 단계 문서의 NOT_STARTED·시험 수는 작성 시점의 기록입니다. 최신 상태는 이 README와 최신 검증 보고서를 우선합니다. 실제 참가 대회의 공고·기한, 평가 자료의 사람 검토, 발표 리허설과 최종 제출 형식은 사용자 확인이 필요합니다.

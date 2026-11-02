@@ -1,0 +1,135 @@
+{
+  "index_created_at": "2026-11-02T03:57:30.079701+00:00",
+  "implementation_commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+  "runtime_and_configuration_match_implementation_commit": true,
+  "node_version": "v24.22.0",
+  "evidence": [
+    {
+      "path": "artifacts/ai/live-verification.json",
+      "sha256": "5fd21c7689fc7d61265c438069853af87201c45692b796cb8744ef7f9af19038",
+      "source_commit_in_artifact": null,
+      "execution_time_in_artifact": "2026-11-02T02:32:43.090Z",
+      "historical_metadata_limit": "Exact execution commit not recorded in the original artifact; not retroactively assigned."
+    },
+    {
+      "path": "artifacts/ai/browser-verification.json",
+      "sha256": "04a8868528ba8bb7beed7fea0e62b05b3d2f141a8cbf79e4565b6b505126ea2e",
+      "source_commit_in_artifact": null,
+      "execution_time_in_artifact": "2026-11-02T02:37:15.909Z",
+      "historical_metadata_limit": "Exact execution commit not recorded in the original artifact; not retroactively assigned."
+    },
+    {
+      "path": "artifacts/ai/live-wire-verification-20261102.json",
+      "sha256": "8836259dc2168764e9330b51bca26cf669f35eedd02d40f8f758ad70ba6cae65",
+      "source_commit_in_artifact": "056c096b379dfd5052b062e2022582dd60fd53d9",
+      "execution_time_in_artifact": "2026-11-02T03:49:10.428Z"
+    },
+    {
+      "path": "artifacts/ai/browser-verification-20261102-v2.json",
+      "sha256": "8b22a10f0f0ebf5a404c19f678bfdf970cd7826e839f66391856444e93b6f6ac",
+      "source_commit_in_artifact": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+      "execution_time_in_artifact": "2026-11-02T03:55:17.790Z"
+    },
+    {
+      "path": "artifacts/ai/development-ui-verification-20261102.json",
+      "sha256": "61e1fcc16691532e4f22f0667b999dced52abe1b3814e0d3c8e5a06af0b4608f",
+      "source_commit_in_artifact": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+      "execution_time_in_artifact": "2026-11-02T03:55:15.176Z"
+    },
+    {
+      "path": "artifacts/ai/unit-verification-20261102-v2.json",
+      "sha256": "d5d8cdfc97cdb58b9b3f11911c77cf1e404d0cd3e7841da55329254466f2fd76",
+      "source_commit_in_artifact": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+      "execution_time_in_artifact": "2026-11-02T03:56:00.574322+00:00"
+    },
+    {
+      "path": "artifacts/ai/client-secret-scan-v2.json",
+      "sha256": "e9bee202c45cfa867e8677302681a1c5702923e91ba6186b628b7ab3911c7894",
+      "source_commit_in_artifact": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+      "execution_time_in_artifact": "2026-11-02T03:57:27.566Z"
+    },
+    {
+      "path": "artifacts/ui/playwright-results.json",
+      "sha256": "f7e9fcd98a442f2ce0a9c8b02b262f35ac23c372554fc7e779ec44fbeabdd04c",
+      "source_commit_in_artifact": null,
+      "execution_time_in_artifact": null,
+      "captured_execution_context": {
+        "commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+        "environment": "local production 3112",
+        "start_time": "2026-11-02T03:55:16.744Z",
+        "expected": 8,
+        "unexpected": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "artifacts/ui/production-security.json",
+      "sha256": "2d7ae006cb1476369d1f61be6a57c02ea26f8d000f21cc78dfa3ab8b62826a08",
+      "source_commit_in_artifact": null,
+      "execution_time_in_artifact": null,
+      "captured_execution_context": {
+        "commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+        "environment": "local production 3112",
+        "execution_time": "not recorded in original JSON",
+        "results": [
+          {
+            "path": "/",
+            "expected": 200,
+            "status": 200,
+            "cacheControl": "s-maxage=31536000"
+          },
+          {
+            "path": "/lab",
+            "expected": 404,
+            "status": 404,
+            "cacheControl": "s-maxage=31536000"
+          },
+          {
+            "path": "/api/analyze",
+            "expected": 503,
+            "status": 503,
+            "cacheControl": "no-store"
+          }
+        ]
+      }
+    },
+    {
+      "path": "docs/08-presentation/public-demo-recording.json",
+      "sha256": "81c5bb3e9b04aae748346c4736e527e1c5eb7b83107f6fe1c698beaa84dc9076",
+      "source_commit_in_artifact": "056c096b379dfd5052b062e2022582dd60fd53d9",
+      "execution_time_in_artifact": "2026-11-02T03:48:57.331Z"
+    },
+    {
+      "path": "docs/08-presentation/public-demo-playback.json",
+      "sha256": "7730eb3729ff58a77988a80f5c0a1546f40860951c99bde1e7334ee54a66c703",
+      "source_commit_in_artifact": null,
+      "execution_time_in_artifact": "2026-11-02T03:52:22.009Z"
+    },
+    {
+      "path": "artifacts/ai/keyboard-reflow-verification-20261102.json",
+      "sha256": "f41d2e8440ebf0033362cc27a10bd08fa28f0868aed206282d7e5e9d85129305"
+    },
+    {
+      "path": "docs/08-presentation/presentation-provenance-20261102.json",
+      "sha256": "4c2f1a9235169696693774fce5ede586bd3815ab36e06f9780495078a11243b3"
+    },
+    {
+      "path": "artifacts/ai/deployment-receipt.json",
+      "sha256": "17ea523bff63982ee007b0d1e46c7924761ac68d2f499068502e4e756ee8ec7b"
+    },
+    {
+      "path": "artifacts/ai/chatgpt-continuation-20261102.json",
+      "sha256": "ab984c472d540e3d8f3f1a9cf1a7de9ad571394e97618cdb4df86f314d8ce749"
+    },
+    {
+      "path": "artifacts/ai/chatgpt-continuation-followup-20261102.json",
+      "sha256": "d4edc3c4904a38cdcbecf88dc9ce2aba6c35a9b9b3e1a2cdbc2c4822345c7c9c"
+    }
+  ],
+  "version_notes": [
+    "Actual wire capture belongs to 056c096; AI module and analyze route are unchanged in cb9cb06. safety.ts changed only the displayed situation description.",
+    "The revised browser and development UI evidence explicitly verify source file hashes against cb9cb06.",
+    "All checks are local. Vercel remote application verification, independent evaluation, competition requirements and human rehearsal remain pending."
+  ],
+  "index_updated_at": "2026-11-02T04:01:25.245901+00:00"
+}

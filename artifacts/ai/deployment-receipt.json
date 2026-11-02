@@ -1,15 +1,15 @@
 {
-  "checked_at": "2026-11-02T02:52:18Z",
+  "checked_at": "2026-11-02T04:01:25.245901+00:00",
   "repository": "MetaStudy999/k-safe-ai-hackathon-2026",
   "branch": "feat/ai-completion-20261102",
-  "app_commit": "70486f4b7ba822cc30b089512c2132f34dbf056a",
+  "app_commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
   "pull_request": "https://github.com/MetaStudy999/k-safe-ai-hackathon-2026/pull/4",
-  "deployment_id": "dpl_GWt1HcgeodsMJqPcaqvJ67cRRsA4",
-  "deployment_dashboard": "https://vercel.com/metastudy999-7115s-projects/k-safe-ai-hackathon-2026/GWt1HcgeodsMJqPcaqvJ67cRRsA4",
+  "deployment_id": null,
+  "deployment_dashboard": "https://vercel.com/metastudy999-7115s-projects/k-safe-ai-hackathon-2026/DhZs2g6iFu5GfxHPKLoMikNiagwK",
   "preview_url": "https://k-safe-ai-hackathon-2026-git-b2271f-metastudy999-7115s-projects.vercel.app",
   "github_vercel_status": "success",
   "vercel_bot_status": "Ready",
-  "remote_application_verification": "PENDING_PROJECT_PERMISSION",
+  "remote_application_verification": "NOT_RUN_PERMISSION_UNRESOLVED",
   "connector_protected_fetch_status": 403,
   "local_production_verification": {
     "home": 200,
@@ -22,5 +22,13 @@
   "team_consent_completed_by_user": true,
   "protected_fetch_after_team_consent_status": 403,
   "pr_mergeable": "MERGEABLE",
-  "pr_merge_state": "CLEAN"
+  "pr_merge_state": "CLEAN",
+  "previous_application_build": {
+    "app_commit": "70486f4b7ba822cc30b089512c2132f34dbf056a",
+    "deployment_id": "dpl_GWt1HcgeodsMJqPcaqvJ67cRRsA4",
+    "deployment_dashboard": "https://vercel.com/metastudy999-7115s-projects/k-safe-ai-hackathon-2026/GWt1HcgeodsMJqPcaqvJ67cRRsA4"
+  },
+  "deployment_dashboard_id": "DhZs2g6iFu5GfxHPKLoMikNiagwK",
+  "vercel_bot_updated_at": "2026-11-02T03:58:49.585Z",
+  "prior_protected_fetch_scope": "403 was observed on the earlier deployment before the UI update. No unchanged permission retry was made for the new deployment."
 }

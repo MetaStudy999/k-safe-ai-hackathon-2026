@@ -1,0 +1,29 @@
+{
+  "manifest_created_at": "2026-11-02T04:01:25.245901+00:00",
+  "latest_implementation_commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+  "deck_assets": [
+    {
+      "path": "docs/08-presentation/K-SAFE-MVP-20261102.pdf",
+      "sha256": "877343515803cd0b60d3ce012fb0b7f784cb8d061b52ff5f90a623cf0bddbcb8",
+      "last_changed_commit": "056c096b379dfd5052b062e2022582dd60fd53d9"
+    },
+    {
+      "path": "docs/08-presentation/K-SAFE-MVP-20261102.pptx",
+      "sha256": "20c456e50a89dc35da7131cc049c28f2ac87a2da33840f91dc1f03ee340e5e80",
+      "last_changed_commit": "056c096b379dfd5052b062e2022582dd60fd53d9"
+    },
+    {
+      "path": "docs/08-presentation/K-SAFE-MVP-20261102.html",
+      "sha256": "e647736408d434e2088c0e20ae4a239a74d1fea4546bd750719b9eb3ba047246",
+      "last_changed_commit": "056c096b379dfd5052b062e2022582dd60fd53d9"
+    }
+  ],
+  "recording_source_commit": "056c096b379dfd5052b062e2022582dd60fd53d9",
+  "recording_scope": "Public scenarios only; recorded before local-only UI fixes; not a demonstration of the updated development UI or live AI.",
+  "current_development_ui_evidence": [
+    "artifacts/ai/local-ai-desktop-v2.png",
+    "artifacts/ai/development-ui-390.png"
+  ],
+  "claims_review": "Slides distinguish pre-generated public explanations from development-only live AI. No independent detection accuracy or remote deployment pass claimed.",
+  "human_rehearsal": "NOT_RUN"
+}

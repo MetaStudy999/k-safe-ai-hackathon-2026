@@ -1,5 +1,7 @@
 # 05-4 — 외부 배포 전 보안 승인표 (Pre-deployment Security Gate)
 
+> 2026-11-02 안내: 아래는 당시 분석 서비스의 배포 전 기록이다. 최신 구현은 공개 가상 사례·사전 생성 설명과 개발용 실제 AI를 구분한다. 사용자 입력 분석의 production 차단은 유지하며, 최신 상태는 [현재 검증](MVP-20261102.md)과 [배포 범위·완료 조건](../06-deployment/README.md)을 참조한다.
+>
 > 2026-10-30 · **검토 문서 작성 / 공개 배포 승인 전**
 >
 > [프로젝트](../../README.md) · [05단계 검증](README.md) · [05-3c 로컬 HTTP 실측](HTTP-INTEGRATION-20261030.md) · [WAF 설정 지침](RATE-LIMIT-SETUP.md)
