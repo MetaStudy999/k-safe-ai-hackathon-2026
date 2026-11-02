@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-11-02T03:55:17.790Z",
+  "completed_at": "2026-11-02T03:55:23.899Z",
+  "source_commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+  "source_files": [
+    {
+      "path": "src/lib/safety.ts",
+      "sha256": "cd91df9afaad659f3ceccf7941fd408b3eec853fb1685871086ad5ea7888715d",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/lib/ai-explanation.ts",
+      "sha256": "31bef9f16b1c51d638eda85cab46ebbd445aa17335fe4a763ddcc89a7e82ec92",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/app/api/analyze/route.ts",
+      "sha256": "190d80ee09117eff73d68864c49fcfa2a0469ec8781e018aecc4b973cf5a1c94",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/app/local-analyzer.tsx",
+      "sha256": "96f516a75d7c9d75d2b3ba9960309bd65eb33cb0eedabfc25c5a892b068044eb",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/app/globals.css",
+      "sha256": "f3072f2f21ba0f0b423c1bf6632697404a24cd7301c6d8ee718e1aa5f1b9e536",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/app/public-demo.tsx",
+      "sha256": "ef6b520950ceb4b1174d2ddc27c9450733b81f7985795b0bf911591e7e1666ee",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/data/ai-demo-explanations.json",
+      "sha256": "deae3fd2a920093c8bcfd03eae7bdc59ee2f49d1890c99f51d8f29f471995224",
+      "matches_source_commit": true
+    }
+  ],
+  "environment": "local production 3112 and explicitly enabled development 3113",
+  "live_scope": [
+    "one actual browser to API to OpenAI to UI response",
+    "rule risk/signals/reasons/uncertainty/actions deep equality"
+  ],
+  "mocked_scope": [
+    "delayed old response after situation change",
+    "HTTP 503 fallback"
+  ],
+  "checks": {
+    "public_pre_generated_explanations_four_situations": true,
+    "public_ai_post_requests_zero": true,
+    "emergency_before_ai": true,
+    "browser_api_live_ai_response_rendered": true,
+    "rules_actions_preserved": true,
+    "stale_result_not_applied_after_situation_change": true,
+    "api_failure_preserves_emergency_actions": true
+  },
+  "passed": true
+}

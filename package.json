@@ -8,12 +8,18 @@
     "start": "next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
-    "test:ui": "playwright test"
+    "test:ui": "playwright test",
+    "verify:ai": "node --import tsx scripts/verify-ai.ts",
+    "generate:ai-demo": "node --import tsx scripts/generate-ai-demo.ts",
+    "verify:ai:wire": "node --import tsx scripts/verify-ai-wire.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.106",
+    "ai": "^7.0.159",
     "next": "16.4.3",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

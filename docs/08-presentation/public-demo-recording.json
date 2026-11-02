@@ -1,0 +1,41 @@
+{
+  "recorded_at": "2026-11-02T03:48:57.331Z",
+  "source_commit": "056c096b379dfd5052b062e2022582dd60fd53d9",
+  "duration_ms": 39881,
+  "mode": "automated_local_public_scenario_recording",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "video": "K-SAFE-PUBLIC-DEMO-20261102.webm",
+  "captions_added_for_recording_only": true,
+  "live_ai_calls": 0,
+  "post_requests": 0,
+  "external_requests": 0,
+  "page_errors": 0,
+  "pre_generated_ai_model": "gpt-6-luna",
+  "stages": [
+    {
+      "situation": "before_transfer",
+      "pre_generated_notice_visible": true,
+      "selection_correct": true
+    },
+    {
+      "situation": "already_transferred",
+      "pre_generated_notice_visible": true,
+      "selection_correct": true
+    },
+    {
+      "situation": "installed_app",
+      "pre_generated_notice_visible": true,
+      "selection_correct": true
+    },
+    {
+      "situation": "unsure",
+      "pre_generated_notice_visible": true,
+      "selection_correct": true
+    }
+  ],
+  "human_rehearsal": "NOT_RUN",
+  "remote_deployment_verification": "NOT_RUN"
+}

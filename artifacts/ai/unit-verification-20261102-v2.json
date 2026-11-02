@@ -1,0 +1,81 @@
+{
+  "started_at": "2026-11-02T03:56:00.574322+00:00",
+  "completed_at": "2026-11-02T03:56:01.796930+00:00",
+  "source_commit": "cb9cb065842c13f1fd1a36e45f5f39c0413ff201",
+  "node_version": "v24.22.0",
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-reporter=junit",
+    "tests/ai-demo.test.ts",
+    "tests/ai-explanation.test.ts",
+    "tests/blind-evaluation.test.ts",
+    "tests/contextual-risk.test.ts",
+    "tests/deployment-gate.test.ts",
+    "tests/privacy-security.test.ts",
+    "tests/public-demo.test.ts",
+    "tests/request-guard.test.ts",
+    "tests/safety.test.ts",
+    "tests/synthetic-regression.test.ts"
+  ],
+  "exit_code": 0,
+  "tests": 74,
+  "failures": 0,
+  "skipped": 0,
+  "by_file": {
+    "ai-demo.test.ts": 1,
+    "ai-explanation.test.ts": 8,
+    "blind-evaluation.test.ts": 13,
+    "contextual-risk.test.ts": 16,
+    "deployment-gate.test.ts": 3,
+    "privacy-security.test.ts": 6,
+    "public-demo.test.ts": 3,
+    "request-guard.test.ts": 5,
+    "safety.test.ts": 9,
+    "synthetic-regression.test.ts": 10
+  },
+  "test_files": [
+    {
+      "path": "tests/ai-demo.test.ts",
+      "sha256": "bbba68230cf23561991af6e6c235dbd10a5f2fe960231d7d9a28c4caec002eb5"
+    },
+    {
+      "path": "tests/ai-explanation.test.ts",
+      "sha256": "89d563d36a1bb316b741c7fb9e5054c9e04e9a084ff7851c85adbaf1e30e1af1"
+    },
+    {
+      "path": "tests/blind-evaluation.test.ts",
+      "sha256": "d2c373750056369cf65a3c875a0ca2ae529d08ea62687bbedb988f8a1b2911b7"
+    },
+    {
+      "path": "tests/contextual-risk.test.ts",
+      "sha256": "83cc22e77fc6d081c4fbea774582dc7244e2fd4b76a375630019132073c511d4"
+    },
+    {
+      "path": "tests/deployment-gate.test.ts",
+      "sha256": "d160f9eaa1786e1a00962b626f849d67666f275d9ec349634c33d6548d5cb844"
+    },
+    {
+      "path": "tests/privacy-security.test.ts",
+      "sha256": "1e0c38451106b10761b36a4ddfd1b33c3eceeaf05298fe73151dccddd1fc5069"
+    },
+    {
+      "path": "tests/public-demo.test.ts",
+      "sha256": "67e736e63ab022ba143f08806e24e5504b03176dc09e9f6a408f93c6e06ba6b4"
+    },
+    {
+      "path": "tests/request-guard.test.ts",
+      "sha256": "0e779f7ae01889fda883018fb37f8c97216f183a2488ed93035ece9059e2b5e1"
+    },
+    {
+      "path": "tests/safety.test.ts",
+      "sha256": "180d97682dcea0bd9165b57ec7f9f2d95404f550ad55a8af84d5babdc3dca3a6"
+    },
+    {
+      "path": "tests/synthetic-regression.test.ts",
+      "sha256": "f10330873c0c445330cb34011c220cb4033edbd172110c3f2273ba53d06ae031"
+    }
+  ]
+}

@@ -2325,3 +2325,23 @@ p {
     mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
   }
 }
+
+/* Pre-generated explanations: no client AI calls or user input. */
+.ai-demo-note{margin-top:22px;padding:16px;border:1px solid #c8d7e5;border-radius:12px;background:#f5f9fc;color:#243b4b;line-height:1.75;font-size:14px;overflow-wrap:anywhere}
+.ai-demo-note summary{cursor:pointer;min-height:44px;display:list-item;font-weight:700;align-content:center}
+.ai-demo-note summary:focus-visible{outline:3px solid #1464aa;outline-offset:4px}
+.ai-demo-note .ai-origin{font-size:12px;color:#42586c;margin:12px 0}
+.ai-demo-note ul{padding-left:20px;margin-top:10px}
+.ai-demo-note li+li{margin-top:8px}
+.ai-explanation{margin-top:16px;padding:16px;border:1px solid #c8d7e5;border-radius:12px;line-height:1.8}
+
+/* The public unlayered button reset must not hide local analyzer button text. */
+.site .primaryButton { color: #fff; background: #0b2c4f; }
+.site .primaryButton:hover { background: #0c456e; }
+
+/* Keep the local introduction independent from the public illustration overlay. */
+.site .analyzerHero { display: block; padding: 36px 0 24px; }
+.site .analyzerEyebrow { font-size: 13px; font-weight: 800; color: #087e86; }
+.site .analyzerHero h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.3; letter-spacing: -1.2px; margin: 10px 0 16px; color: #172b45; }
+.site .analyzerHero h1 em { color: #087e86; font-style: normal; }
+.site .analyzerHero > p { margin-bottom: 18px; color: #596285; font-size: 15px; line-height: 1.7; }

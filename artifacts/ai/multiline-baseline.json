@@ -1,0 +1,27 @@
+{
+  "classification": "development_regression_not_independent",
+  "cases": [
+    {
+      "situation": "before_transfer",
+      "signals": [
+        "upfront_payment",
+        "unverified_app_install"
+      ]
+    },
+    {
+      "situation": "already_transferred",
+      "signals": [
+        "upfront_payment",
+        "unverified_app_install"
+      ]
+    },
+    {
+      "situation": "installed_app",
+      "signals": []
+    },
+    {
+      "situation": "unsure",
+      "signals": []
+    }
+  ]
+}

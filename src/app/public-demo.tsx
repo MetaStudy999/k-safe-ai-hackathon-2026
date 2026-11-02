@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { PUBLIC_DEMO_SCENARIOS, getPublicDemoActions } from "@/lib/public-demo";
 import type { Situation } from "@/lib/safety";
+import AiDemoNote from "./ai-demo-note";
 
 const paths: Record<string, React.ReactNode> = {
   send: <path d="m3 10 18-7-7 18-3-7-8-4Zm8 4L21 3" />,
@@ -429,6 +430,7 @@ export default function PublicDemo() {
                     ))}
                   </div>
                 </div>
+                <AiDemoNote situation={situation} />
               </div>
             </section>
             <section

@@ -1,0 +1,144 @@
+{
+  "before_transfer": {
+    "input_sha256": "54785280f7d4c5995ac5a8f2113a7e4431e4ca37555cbbff3ee9aace88d23c91",
+    "result": {
+      "risk_level": "warning",
+      "signals": [
+        "upfront_payment",
+        "unverified_app_install"
+      ],
+      "reasons": [
+        "대출·환급을 위해 선입금이나 상환을 먼저 요구합니다.",
+        "별도 앱 설치를 유도하고 있습니다."
+      ],
+      "uncertainty_notice": "이 결과만으로 사기 여부를 확정할 수 없습니다. 공식 경로로 직접 확인하세요.",
+      "recommended_actions": [
+        "송금·앱 설치·인증번호 전달을 멈추세요.",
+        "문자 속 번호가 아닌 공식 홈페이지에 나온 대표번호로 직접 확인하세요.",
+        "판단이 어려우면 118 등 공식 상담 창구에 문의하세요."
+      ],
+      "source": "rules_with_ai_explanation",
+      "analysis_status": "completed",
+      "ai": {
+        "status": "generated",
+        "model": "gpt-6-luna",
+        "summary": "송금 전 선입금 요구와 별도 앱 설치 유도가 확인 신호로 제공되었습니다.",
+        "explanations": [
+          {
+            "signal_id": "upfront_payment",
+            "text": "대출이나 환급을 받기 전에 돈을 먼저 내라고 하는 내용이 있어, 요구의 근거와 조건을 추가로 확인할 필요가 있습니다."
+          },
+          {
+            "signal_id": "unverified_app_install",
+            "text": "별도 앱 설치를 유도하는 내용이 있어, 앱의 출처와 필요한 이유를 추가로 확인할 필요가 있습니다."
+          }
+        ]
+      }
+    }
+  },
+  "already_transferred": {
+    "input_sha256": "862ef13f92e7cbe2c72bc05e1e3a487118a999a5b8c62bf75feceeca9f03c58c",
+    "result": {
+      "risk_level": "warning",
+      "signals": [
+        "upfront_payment",
+        "unverified_app_install"
+      ],
+      "reasons": [
+        "대출·환급을 위해 선입금이나 상환을 먼저 요구합니다.",
+        "별도 앱 설치를 유도하고 있습니다."
+      ],
+      "uncertainty_notice": "이 결과만으로 사기 여부를 확정할 수 없습니다. 공식 경로로 직접 확인하세요.",
+      "recommended_actions": [
+        "AI 분석을 기다리지 말고 즉시 112와 거래 금융회사에 연락해 피해 신고·지급정지를 문의하세요.",
+        "상대방에게 추가로 송금하거나 인증번호를 알려주지 마세요.",
+        "거래 내역과 연락 기록을 안전하게 보관하세요."
+      ],
+      "source": "rules_with_ai_explanation",
+      "analysis_status": "completed",
+      "ai": {
+        "status": "generated",
+        "model": "gpt-6-luna",
+        "summary": "이미 송금한 상황에서 선입금 요구와 별도 앱 설치 유도가 확인되어, 각각의 이유와 내용을 추가로 살펴볼 필요가 있습니다.",
+        "explanations": [
+          {
+            "signal_id": "upfront_payment",
+            "text": "대출이나 환급을 내세워 먼저 돈을 요구하는 내용은 비용의 근거와 조건을 확인할 필요가 있습니다."
+          },
+          {
+            "signal_id": "unverified_app_install",
+            "text": "별도 앱 설치를 유도하는 내용은 앱의 출처와 요구된 권한을 확인할 필요가 있습니다."
+          }
+        ]
+      }
+    }
+  },
+  "installed_app": {
+    "input_sha256": "ad092f0bb0552d9f747b46f4472ca17ef89740c1a654d31d7a187f654a1c2ea9",
+    "result": {
+      "risk_level": "review",
+      "signals": [
+        "remote_support_install"
+      ],
+      "reasons": [
+        "고객센터 지원을 빌미로 원격제어 프로그램을 설치하도록 유도합니다."
+      ],
+      "uncertainty_notice": "이 결과만으로 사기 여부를 확정할 수 없습니다. 공식 경로로 직접 확인하세요.",
+      "recommended_actions": [
+        "의심 앱에서 로그인·인증·송금을 하지 마세요.",
+        "안전한 다른 기기로 금융회사에 직접 연락하고, 스미싱 상담은 118에 문의하세요.",
+        "금전 피해가 의심된다면 112와 금융회사에 즉시 연락하세요."
+      ],
+      "source": "rules_with_ai_explanation",
+      "analysis_status": "completed",
+      "ai": {
+        "status": "generated",
+        "model": "gpt-6-luna",
+        "summary": "고객센터 지원을 이유로 원격제어 프로그램 설치를 유도하는 상황입니다.",
+        "explanations": [
+          {
+            "signal_id": "remote_support_install",
+            "text": "원격제어 프로그램은 기기 화면이나 조작에 접근할 수 있어, 고객센터 지원이라는 설명만으로 설치를 권하는 이유를 추가로 확인할 필요가 있습니다."
+          }
+        ]
+      }
+    }
+  },
+  "unsure": {
+    "input_sha256": "8352812d9aee3615c9f314c4ed9867d0a95823d1300c2a9577fa9d43cb024b9c",
+    "result": {
+      "risk_level": "warning",
+      "signals": [
+        "delivery_redirection",
+        "delivery_address_redirect"
+      ],
+      "reasons": [
+        "배송지 오류를 내세워 별도 링크에서 수정을 유도합니다. 공식 택배사 경로로 확인하세요.",
+        "배송·수취지 확인을 빌미로 별도 주소 접속을 요청합니다."
+      ],
+      "uncertainty_notice": "이 결과만으로 사기 여부를 확정할 수 없습니다. 공식 경로로 직접 확인하세요.",
+      "recommended_actions": [
+        "송금·앱 설치·인증번호 전달을 멈추세요.",
+        "문자 속 번호가 아닌 공식 홈페이지에 나온 대표번호로 직접 확인하세요.",
+        "판단이 어려우면 118 등 공식 상담 창구에 문의하세요."
+      ],
+      "source": "rules_with_ai_explanation",
+      "analysis_status": "completed",
+      "ai": {
+        "status": "generated",
+        "model": "gpt-6-luna",
+        "summary": "배송지 확인을 위해 별도 주소로 유도하는 신호가 있어 공식 경로인지 추가 확인이 필요합니다.",
+        "explanations": [
+          {
+            "signal_id": "delivery_redirection",
+            "text": "배송지 오류를 이유로 별도 링크에서 수정을 유도하는 신호이므로, 공식 택배사 경로인지 확인이 필요합니다."
+          },
+          {
+            "signal_id": "delivery_address_redirect",
+            "text": "배송이나 수취지 확인을 빌미로 별도 주소 접속을 요청하는 신호이므로, 해당 주소가 공식 경로인지 추가 확인이 필요합니다."
+          }
+        ]
+      }
+    }
+  }
+}

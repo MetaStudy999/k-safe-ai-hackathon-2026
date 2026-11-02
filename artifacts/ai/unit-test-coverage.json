@@ -1,0 +1,34 @@
+{
+  "checked_at": "2026-11-02T02:54:00Z",
+  "command": "node --import tsx --test --test-reporter=junit tests/*.test.ts",
+  "tests": 74,
+  "failures": 0,
+  "skipped": 0,
+  "by_file": {
+    "ai-demo.test.ts": 1,
+    "ai-explanation.test.ts": 8,
+    "blind-evaluation.test.ts": 13,
+    "contextual-risk.test.ts": 16,
+    "deployment-gate.test.ts": 3,
+    "privacy-security.test.ts": 6,
+    "public-demo.test.ts": 3,
+    "request-guard.test.ts": 5,
+    "safety.test.ts": 9,
+    "synthetic-regression.test.ts": 10
+  },
+  "baseline_commit": "d54b96cf147f51eb118effffebe6fef14bc0fd72",
+  "test_files_changed_since_baseline": [
+    "A\ttests/ai-demo.test.ts",
+    "A\ttests/ai-explanation.test.ts"
+  ],
+  "baseline_unchanged_tests": 65,
+  "new_openai_tests": 9,
+  "prior_107_report": {
+    "implementation": "separate uncommitted local Ollama adapter in original worktree, preserved",
+    "baseline_tests": 65,
+    "ollama_adapter_tests": 46,
+    "cli_tests_excluded_due_to_environment": 4,
+    "reported_total": 107,
+    "same_test_suite_as_current": false
+  }
+}

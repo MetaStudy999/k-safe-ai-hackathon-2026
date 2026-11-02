@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-11-02T02:34:52.961Z",
+  "model": "gpt-6-luna",
+  "mode": "pre_generated_explanation",
+  "source": "live_openai_responses",
+  "raw_message_transmitted": false,
+  "cases": [
+    {
+      "situation": "before_transfer",
+      "input_sha256": "54785280f7d4c5995ac5a8f2113a7e4431e4ca37555cbbff3ee9aace88d23c91",
+      "status": "generated",
+      "model": "gpt-6-luna",
+      "summary": "송금 전 선입금 요구와 별도 앱 설치 유도가 확인 신호로 제공되었습니다.",
+      "explanations": [
+        {
+          "signal_id": "upfront_payment",
+          "text": "대출이나 환급을 받기 전에 돈을 먼저 내라고 하는 내용이 있어, 요구의 근거와 조건을 추가로 확인할 필요가 있습니다."
+        },
+        {
+          "signal_id": "unverified_app_install",
+          "text": "별도 앱 설치를 유도하는 내용이 있어, 앱의 출처와 필요한 이유를 추가로 확인할 필요가 있습니다."
+        }
+      ]
+    },
+    {
+      "situation": "already_transferred",
+      "input_sha256": "862ef13f92e7cbe2c72bc05e1e3a487118a999a5b8c62bf75feceeca9f03c58c",
+      "status": "generated",
+      "model": "gpt-6-luna",
+      "summary": "이미 송금한 상황에서 선입금 요구와 별도 앱 설치 유도가 확인되어, 각각의 이유와 내용을 추가로 살펴볼 필요가 있습니다.",
+      "explanations": [
+        {
+          "signal_id": "upfront_payment",
+          "text": "대출이나 환급을 내세워 먼저 돈을 요구하는 내용은 비용의 근거와 조건을 확인할 필요가 있습니다."
+        },
+        {
+          "signal_id": "unverified_app_install",
+          "text": "별도 앱 설치를 유도하는 내용은 앱의 출처와 요구된 권한을 확인할 필요가 있습니다."
+        }
+      ]
+    },
+    {
+      "situation": "installed_app",
+      "input_sha256": "ad092f0bb0552d9f747b46f4472ca17ef89740c1a654d31d7a187f654a1c2ea9",
+      "status": "generated",
+      "model": "gpt-6-luna",
+      "summary": "고객센터 지원을 이유로 원격제어 프로그램 설치를 유도하는 상황입니다.",
+      "explanations": [
+        {
+          "signal_id": "remote_support_install",
+          "text": "원격제어 프로그램은 기기 화면이나 조작에 접근할 수 있어, 고객센터 지원이라는 설명만으로 설치를 권하는 이유를 추가로 확인할 필요가 있습니다."
+        }
+      ]
+    },
+    {
+      "situation": "unsure",
+      "input_sha256": "8352812d9aee3615c9f314c4ed9867d0a95823d1300c2a9577fa9d43cb024b9c",
+      "status": "generated",
+      "model": "gpt-6-luna",
+      "summary": "배송지 확인을 위해 별도 주소로 유도하는 신호가 있어 공식 경로인지 추가 확인이 필요합니다.",
+      "explanations": [
+        {
+          "signal_id": "delivery_redirection",
+          "text": "배송지 오류를 이유로 별도 링크에서 수정을 유도하는 신호이므로, 공식 택배사 경로인지 확인이 필요합니다."
+        },
+        {
+          "signal_id": "delivery_address_redirect",
+          "text": "배송이나 수취지 확인을 빌미로 별도 주소 접속을 요청하는 신호이므로, 해당 주소가 공식 경로인지 추가 확인이 필요합니다."
+        }
+      ]
+    }
+  ]
+}

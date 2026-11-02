@@ -1,0 +1,10 @@
+{
+  "source_commit": "056c096b379dfd5052b062e2022582dd60fd53d9",
+  "selector": ".primaryButton",
+  "computed_foreground": "rgb(12, 17, 57)",
+  "computed_background": "rgb(11, 44, 79)",
+  "issue": "Unlayered global button color overrides the legacy-layer white button text.",
+  "situation_detail_issue": "already_transferred included account sharing as well as sending money.",
+  "artifact_written_at": "2026-11-02T03:51:06.496185+00:00",
+  "observation_time": "exact time not recorded; observed in this session before the fix"
+}

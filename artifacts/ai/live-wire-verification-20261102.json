@@ -1,0 +1,128 @@
+{
+  "checked_at": "2026-11-02T03:49:10.428Z",
+  "completed_at": "2026-11-02T03:49:20.019Z",
+  "source_commit": "056c096b379dfd5052b062e2022582dd60fd53d9",
+  "source_files": [
+    {
+      "path": "src/lib/safety.ts",
+      "sha256": "ebe6a09fddaa56e6054605c116575d7aff1bc35d7f0f4630df03b3b6fb95cdaf",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/lib/ai-explanation.ts",
+      "sha256": "31bef9f16b1c51d638eda85cab46ebbd445aa17335fe4a763ddcc89a7e82ec92",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/app/api/analyze/route.ts",
+      "sha256": "190d80ee09117eff73d68864c49fcfa2a0469ec8781e018aecc4b973cf5a1c94",
+      "matches_source_commit": true
+    },
+    {
+      "path": "src/app/local-analyzer.tsx",
+      "sha256": "b4309472063301e41cfc32b8260d48b376fcd4b24f61294862dd4a72e566c456",
+      "matches_source_commit": true
+    }
+  ],
+  "verification_script_sha256": "962a1fa72b75a49f506d7deb9e1ce0abe3f7f9ca87060acd3141e635e6379b3d",
+  "node_version": "v24.22.0",
+  "model": "gpt-6-luna",
+  "environment": "explicit development AI function in local verification process",
+  "live_fetch_forwarded": true,
+  "authorization_headers_recorded": false,
+  "raw_request_bodies_recorded": false,
+  "raw_model_outputs_recorded": false,
+  "sample_size": 3,
+  "generated": 3,
+  "unavailable": 0,
+  "invalid": 0,
+  "timeout_vs_other_unavailable": "NOT_DISTINGUISHED_BY_PUBLIC_STATUS",
+  "provider_cold_or_warm_state": "UNKNOWN",
+  "scope": "Three synthetic requests only; not a latency SLA, representative distribution, independent detection evaluation, or proof about provider-side logging.",
+  "samples": [
+    {
+      "sample": 1,
+      "phase": "first_request_in_this_process",
+      "elapsed_ms": 3774,
+      "ai_status": "generated",
+      "risk_preserved": true,
+      "actions_preserved": true,
+      "signal_ids": [
+        "upfront_payment",
+        "unverified_app_install"
+      ],
+      "wire": [
+        {
+          "request_body_sha256": "aae3da8c9c6fa30aa3a35a52f9e92032ee8f1abac6b7118efeecfe2b2ed25230",
+          "user_input_sha256": "862ef13f92e7cbe2c72bc05e1e3a487118a999a5b8c62bf75feceeca9f03c58c",
+          "canonical_input_matches": true,
+          "raw_message_absent": true,
+          "redacted_message_absent": true,
+          "private_marker_absent": true,
+          "untrusted_command_absent": true,
+          "key_absent_from_body": true,
+          "store_false": true,
+          "tools_absent": true,
+          "http_status": 200,
+          "provider_request_id": "req_79cfe828f54e4a8ca54af8f44d651270"
+        }
+      ]
+    },
+    {
+      "sample": 2,
+      "phase": "subsequent_request_in_this_process",
+      "elapsed_ms": 3719,
+      "ai_status": "generated",
+      "risk_preserved": true,
+      "actions_preserved": true,
+      "signal_ids": [
+        "upfront_payment",
+        "unverified_app_install"
+      ],
+      "wire": [
+        {
+          "request_body_sha256": "aae3da8c9c6fa30aa3a35a52f9e92032ee8f1abac6b7118efeecfe2b2ed25230",
+          "user_input_sha256": "862ef13f92e7cbe2c72bc05e1e3a487118a999a5b8c62bf75feceeca9f03c58c",
+          "canonical_input_matches": true,
+          "raw_message_absent": true,
+          "redacted_message_absent": true,
+          "private_marker_absent": true,
+          "untrusted_command_absent": true,
+          "key_absent_from_body": true,
+          "store_false": true,
+          "tools_absent": true,
+          "http_status": 200,
+          "provider_request_id": "req_21aca754087f46369780529c0f7bfbdd"
+        }
+      ]
+    },
+    {
+      "sample": 3,
+      "phase": "subsequent_request_in_this_process",
+      "elapsed_ms": 2070,
+      "ai_status": "generated",
+      "risk_preserved": true,
+      "actions_preserved": true,
+      "signal_ids": [
+        "upfront_payment",
+        "unverified_app_install"
+      ],
+      "wire": [
+        {
+          "request_body_sha256": "aae3da8c9c6fa30aa3a35a52f9e92032ee8f1abac6b7118efeecfe2b2ed25230",
+          "user_input_sha256": "862ef13f92e7cbe2c72bc05e1e3a487118a999a5b8c62bf75feceeca9f03c58c",
+          "canonical_input_matches": true,
+          "raw_message_absent": true,
+          "redacted_message_absent": true,
+          "private_marker_absent": true,
+          "untrusted_command_absent": true,
+          "key_absent_from_body": true,
+          "store_false": true,
+          "tools_absent": true,
+          "http_status": 200,
+          "provider_request_id": "req_c4c328e907bf4d408277cfb8dd0c028d"
+        }
+      ]
+    }
+  ]
+}

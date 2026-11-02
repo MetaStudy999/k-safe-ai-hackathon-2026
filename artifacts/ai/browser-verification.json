@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-11-02T02:37:15.909Z",
+  "checks": {
+    "public_pre_generated_explanations_four_situations": true,
+    "public_ai_post_requests_zero": true,
+    "emergency_before_ai": true,
+    "browser_api_live_ai_response_rendered": true,
+    "rules_actions_preserved": true,
+    "stale_result_not_applied_after_situation_change": true,
+    "api_failure_preserves_emergency_actions": true
+  },
+  "passed": true
+}
