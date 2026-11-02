@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-11-02T02:42:44.552Z",
+  "author": "OpenAI gpt-6-luna, separate generation request",
+  "source_code_commit_frozen_before_generation": "1db856a87bd7ea2f742af5294df939cdf8d7d4b5",
+  "classifier_sha256": "ebe6a09fddaa56e6054605c116575d7aff1bc35d7f0f4630df03b3b6fb95cdaf",
+  "data_sha256": "462cbbc42c4d54ee77dc0a9c02d133fc7cee8a2aa7f17d3f9d54ac2063202ed6",
+  "sample_size": 24,
+  "counts": {
+    "scam": 10,
+    "benign": 10,
+    "borderline": 4
+  },
+  "human_label_review": "REQUIRED",
+  "independence_review": "REQUIRED",
+  "evaluation": "NOT_RUN",
+  "formal_independent_quality_pass": false
+}
