@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-11-02T02:52:18Z",
+  "repository": "MetaStudy999/k-safe-ai-hackathon-2026",
+  "branch": "feat/ai-completion-20261102",
+  "app_commit": "70486f4b7ba822cc30b089512c2132f34dbf056a",
+  "pull_request": "https://github.com/MetaStudy999/k-safe-ai-hackathon-2026/pull/4",
+  "deployment_id": "dpl_GWt1HcgeodsMJqPcaqvJ67cRRsA4",
+  "deployment_dashboard": "https://vercel.com/metastudy999-7115s-projects/k-safe-ai-hackathon-2026/GWt1HcgeodsMJqPcaqvJ67cRRsA4",
+  "preview_url": "https://k-safe-ai-hackathon-2026-git-b2271f-metastudy999-7115s-projects.vercel.app",
+  "github_vercel_status": "success",
+  "vercel_bot_status": "Ready",
+  "remote_application_verification": "PENDING_PROJECT_PERMISSION",
+  "connector_protected_fetch_status": 403,
+  "local_production_verification": {
+    "home": 200,
+    "lab": 404,
+    "analyze_post": 503
+  },
+  "production_promoted": false,
+  "protection_changed": false,
+  "openai_key_uploaded": false,
+  "team_consent_completed_by_user": true,
+  "protected_fetch_after_team_consent_status": 403,
+  "pr_mergeable": "MERGEABLE",
+  "pr_merge_state": "CLEAN"
+}

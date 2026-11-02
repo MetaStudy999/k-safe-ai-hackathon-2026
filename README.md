@@ -26,7 +26,7 @@
 | 독립 탐지 품질 | 사람의 자료·라벨 검토 대기 | 시험 수를 탐지 정확도로 주장하지 않음 |
 | 공식 대회 요건 | 실제 공고·기한 미확정 | 다른 대회 자료는 참고용 |
 
-현재 운영 주소의 기존 배포와 이 브랜치의 최신 변경은 별개입니다. 최신 공개 반영 여부와 배포 커밋은 [검증 기록](docs/05-verification/MVP-20261102.md)의 배포 영수증을 확인하세요.
+현재 운영 주소의 기존 배포와 이 브랜치의 최신 변경은 별개입니다. [최신 미리보기](https://k-safe-ai-hackathon-2026-git-b2271f-metastudy999-7115s-projects.vercel.app)는 Vercel 로그인 보호가 적용되며 배포 상태는 Ready입니다. 팀 접근 승인 후에도 Vercel 연결이 403을 반환해 원격 본문 검증은 프로젝트 권한 확인 대기입니다. [PR #4](https://github.com/MetaStudy999/k-safe-ai-hackathon-2026/pull/4)와 [검증 기록](docs/05-verification/MVP-20261102.md)의 배포 영수증을 확인하세요.
 
 ## 3분 시연
 
@@ -39,10 +39,10 @@
 
 ## 로컬 재현
 
-기존 WSL2 폴더는 `~/codyssey/k-safe-ai-hackathon-2026`입니다. 기존 작업을 초기화하거나 다시 복제할 필요는 없습니다. Node.js는 `.nvmrc`의 **24.22.0**을 사용합니다.
+이번 구현은 `feat/ai-completion-20261102` 브랜치에 있으며 WSL2 작업 폴더는 `~/codyssey/k-safe-ai-mvp-20261102`입니다. 기존 `~/codyssey/k-safe-ai-hackathon-2026` 폴더의 미완료 작업을 보존하기 위해 별도 worktree를 사용했습니다. Node.js는 `.nvmrc`의 **24.22.0**을 사용합니다. 다른 환경에서는 PR 브랜치를 받은 폴더에서 아래 명령을 실행합니다.
 
 ```bash
-cd ~/codyssey/k-safe-ai-hackathon-2026
+cd ~/codyssey/k-safe-ai-mvp-20261102
 nvm use
 npm ci
 npm run typecheck
