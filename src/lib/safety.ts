@@ -13,7 +13,7 @@ export type AnalysisResult = {
 
 export const SITUATIONS: { id: Situation; label: string; detail: string }[] = [
   { id: "before_transfer", label: "송금 전", detail: "아직 돈을 보내지 않았어요" },
-  { id: "already_transferred", label: "이미 송금", detail: "돈을 보냈거나 계좌를 알려줬어요" },
+  { id: "already_transferred", label: "이미 송금", detail: "이미 돈을 보냈어요" },
   { id: "installed_app", label: "앱 설치함", detail: "안내받은 앱을 설치했어요" },
   { id: "unsure", label: "잘 모르겠음", detail: "상황을 판단하기 어려워요" }
 ];

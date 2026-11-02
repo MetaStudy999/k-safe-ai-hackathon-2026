@@ -62,8 +62,8 @@ export default function HomePage() {
         <span className="demoTag">2026 AI 해커톤 · 시연용</span>
       </header>
 
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="eyebrow">대한민국 국민의 금융안전을 위한 서비스</div>
+      <section className="analyzerHero" aria-labelledby="hero-title">
+        <div className="analyzerEyebrow">대한민국 국민의 금융안전을 위한 서비스</div>
         <h1 id="hero-title">의심스러운 연락,<br /><em>어떻게 대응해야 할까요?</em></h1>
         <p>문자의 위험 신호를 살펴보고, 지금 상황에 맞는 안전행동을 확인하세요.</p>
         <div className="heroNotice"><strong>개인정보 보호 안내</strong><span>실제 주민등록번호·계좌번호·비밀번호·인증번호를 입력하지 마세요. 합성 예시로 테스트해 주세요.</span></div>
@@ -101,17 +101,17 @@ export default function HomePage() {
           {result ? (
             <div aria-live="polite" className="analysisBox">
               <div className={"riskTag " + result.risk_level}>{result.risk_level === "warning" ? "주의 · 다수 위험 신호" : result.risk_level === "review" ? "추가 확인 · 위험 신호" : "명확한 신호 없음 · 안전 보증 아님"}</div>
-              <h3>감지한 단서</h3>
+              <h3>입력에서 찾은 규칙 신호</h3>
               <ul className="reasons">{result.reasons.map((reason, i) => <li key={i}>{reason}</li>)}</ul>
               <p className="disclaimer">{result.uncertainty_notice}</p>
               <p className="mode">분석 방식: 규칙 기반 · {result.ai?.status === "generated" ? "AI 보조 설명 연결" : "기본 규칙 안내"}</p>
-              {result.ai?.status === "generated" ? <div className="ai-explanation"><h3>AI가 풀어 쓴 위험 신호</h3><p>{result.ai.summary}</p><ul>{result.ai.explanations?.map((item) => <li key={item.signal_id}>{item.text}</li>)}</ul><p className="finePrint">AI는 원문을 읽거나 사기를 판정하지 않습니다. 위험 수준과 아래 행동은 규칙에 따라 유지됩니다.</p></div> : <p className="finePrint">{result.ai?.status === "limited" ? "이번 실행의 AI 사용 한도에 도달했거나 다른 설명을 처리 중입니다." : result.ai?.status === "unavailable" || result.ai?.status === "invalid" ? "AI 설명을 사용할 수 없어 규칙 안내를 표시합니다." : result.ai?.status === "no_signals" ? "규칙 신호가 없어 AI 설명을 요청하지 않았습니다. 안전하다는 뜻은 아닙니다." : "AI 설명이 꺼져 있습니다."}</p>}
+              {result.ai?.status === "generated" ? <div className="ai-explanation"><h3>AI 보조 설명</h3><p>{result.ai.summary}</p><ul>{result.ai.explanations?.map((item) => <li key={item.signal_id}>{item.text}</li>)}</ul><p className="finePrint">AI는 원문을 읽거나 사기를 판정하지 않습니다. 위험 수준과 아래 행동은 규칙에 따라 유지됩니다.</p></div> : <p className="finePrint">{result.ai?.status === "limited" ? "이번 실행의 AI 사용 한도에 도달했거나 다른 설명을 처리 중입니다." : result.ai?.status === "unavailable" || result.ai?.status === "invalid" ? "AI 설명을 사용할 수 없어 규칙 안내를 표시합니다." : result.ai?.status === "no_signals" ? "규칙 신호가 없어 AI 설명을 요청하지 않았습니다. 안전하다는 뜻은 아닙니다." : "AI 설명이 꺼져 있습니다."}</p>}
             </div>
           ) : (
             <div className="emptyResult"><span aria-hidden="true">◎</span><strong>분석할 메시지를 입력해 주세요</strong><p>위험 신호와 판단의 한계가 이곳에 표시됩니다.</p></div>
           )}
 
-          <div className="guide"><h3>지금 해야 할 일</h3><ol>{currentActions.map((action, i) => <li key={i}>{action}</li>)}</ol></div>
+          <div className="guide"><h3>상황별 기본 안전행동</h3><ol>{currentActions.map((action, i) => <li key={i}>{action}</li>)}</ol></div>
           <div className="official"><h3>공식 확인·상담 안내</h3><p><b>112</b> · 금융사기 피해 신고 / <b>118</b> · 스미싱·인터넷침해 상담</p><p>금융회사는 메시지의 번호가 아니라 공식 홈페이지의 대표번호로 직접 확인하세요.</p></div>
           <p className="finePrint">⚠️ K-SAFE는 사기 여부를 확정하지 않으며, 경찰·금융회사 판단이나 신고 절차를 대신하지 않습니다. 실제 피해가 의심된다면 결과를 기다리지 마세요.</p>
         </section>

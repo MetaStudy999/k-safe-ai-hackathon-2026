@@ -2,10 +2,10 @@
 import { readFileSync } from "node:fs";
 import { parseEnv } from "node:util";
 import { spawn } from "node:child_process";
-const modes = { dev: ["run", "dev"], verify: ["run", "verify:ai"], generate: ["run", "generate:ai-demo"] };
+const modes = { dev: ["run", "dev"], verify: ["run", "verify:ai"], generate: ["run", "generate:ai-demo"], wire: ["run", "verify:ai:wire"] };
 const [mode, file] = process.argv.slice(2);
 if (!Object.hasOwn(modes, mode) || !file) {
-  console.error("Usage: node scripts/with-existing-key.mjs dev|verify|generate <existing-env-file>");
+  console.error("Usage: node scripts/with-existing-key.mjs dev|verify|generate|wire <existing-env-file>");
   process.exit(1);
 }
 let key;

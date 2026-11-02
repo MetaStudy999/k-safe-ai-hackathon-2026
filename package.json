@@ -10,7 +10,8 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "test:ui": "playwright test",
     "verify:ai": "node --import tsx scripts/verify-ai.ts",
-    "generate:ai-demo": "node --import tsx scripts/generate-ai-demo.ts"
+    "generate:ai-demo": "node --import tsx scripts/generate-ai-demo.ts",
+    "verify:ai:wire": "node --import tsx scripts/verify-ai-wire.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.106",
