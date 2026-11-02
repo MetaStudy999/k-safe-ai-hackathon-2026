@@ -13,8 +13,8 @@
     "orientationAngle": 0,
     "orientationType": "landscape-primary"
   },
-  "timestamp": "2026-10-30T08:42:01.781Z",
-  "url": "http://127.0.0.1:3104/",
+  "timestamp": "2026-11-02T02:36:43.278Z",
+  "url": "http://127.0.0.1:3112/",
   "toolOptions": {
     "runOnly": {
       "type": "tag",
@@ -587,25 +587,6 @@
       "description": "Ensure that server-side image maps are not used",
       "help": "Server-side image maps must not be used",
       "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/server-side-image-map?application=playwright",
-      "nodes": []
-    },
-    {
-      "id": "summary-name",
-      "impact": null,
-      "tags": [
-        "cat.name-role-value",
-        "wcag2a",
-        "wcag412",
-        "section508",
-        "section508.22.a",
-        "TTv5",
-        "TT6.a",
-        "EN-301-549",
-        "EN-9.4.1.2"
-      ],
-      "description": "Ensure summary elements have discernible text",
-      "help": "Summary elements must have discernible text",
-      "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/summary-name?application=playwright",
       "nodes": []
     },
     {
@@ -4340,6 +4321,31 @@
             {
               "id": "color-contrast",
               "data": {
+                "fgColor": "#243b4b",
+                "bgColor": "#f5f9fc",
+                "contrastRatio": 11,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "bold",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element has sufficient color contrast of 11"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": null,
+          "html": "<summary>AI가 풀어 쓴 가상 사례 설명</summary>",
+          "target": [
+            "summary"
+          ]
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
                 "fgColor": "#1655ff",
                 "bgColor": "#e0eeff",
                 "contrastRatio": 4.72,
@@ -5590,7 +5596,7 @@
           "impact": null,
           "html": "<li>",
           "target": [
-            "li:nth-child(1)"
+            "ol > li:nth-child(1)"
           ]
         },
         {
@@ -5608,7 +5614,7 @@
           "impact": null,
           "html": "<li>",
           "target": [
-            "li:nth-child(2)"
+            "ol > li:nth-child(2)"
           ]
         },
         {
@@ -5825,6 +5831,24 @@
           "all": [],
           "none": [],
           "impact": null,
+          "html": "<summary>AI가 풀어 쓴 가상 사례 설명</summary>",
+          "target": [
+            "summary"
+          ]
+        },
+        {
+          "any": [
+            {
+              "id": "no-focusable-content",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element does not have focusable descendants"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": null,
           "html": "<button class=\"contact-card bank\" type=\"button\">",
           "target": [
             ".contact-card.bank"
@@ -5887,6 +5911,44 @@
           "html": "<div class=\"hero-artwork\" role=\"img\" aria-label=\"푸른 방패가 가족의 안전한 일상을 감싸는 일러스트\">",
           "target": [
             ".hero-artwork"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "summary-name",
+      "impact": null,
+      "tags": [
+        "cat.name-role-value",
+        "wcag2a",
+        "wcag412",
+        "section508",
+        "section508.22.a",
+        "TTv5",
+        "TT6.a",
+        "EN-301-549",
+        "EN-9.4.1.2"
+      ],
+      "description": "Ensure summary elements have discernible text",
+      "help": "Summary elements must have discernible text",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/summary-name?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "has-visible-text",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element has text that is visible to screen readers"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": null,
+          "html": "<summary>AI가 풀어 쓴 가상 사례 설명</summary>",
+          "target": [
+            "summary"
           ]
         }
       ]
@@ -6296,6 +6358,38 @@
           "html": "<input type=\"radio\" name=\"situation\" value=\"unsure\" style=\"\">",
           "target": [
             "input[value=\"unsure\"]"
+          ]
+        },
+        {
+          "any": [
+            {
+              "id": "target-size",
+              "data": {
+                "minSize": 24,
+                "width": 655.2,
+                "height": 44
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Control has sufficient size (655.2px by 44px, should be at least 24px by 24px)"
+            },
+            {
+              "id": "target-offset",
+              "data": {
+                "closestOffset": 24,
+                "minOffset": 24
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Target has sufficient space from its closest neighbors. Safe clickable space has a diameter of 24px which is at least 24px."
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": null,
+          "html": "<summary>AI가 풀어 쓴 가상 사례 설명</summary>",
+          "target": [
+            "summary"
           ]
         },
         {

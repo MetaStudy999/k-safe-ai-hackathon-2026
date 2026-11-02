@@ -2325,3 +2325,12 @@ p {
     mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
   }
 }
+
+/* Pre-generated explanations: no client AI calls or user input. */
+.ai-demo-note{margin-top:22px;padding:16px;border:1px solid #c8d7e5;border-radius:12px;background:#f5f9fc;color:#243b4b;line-height:1.75;font-size:14px;overflow-wrap:anywhere}
+.ai-demo-note summary{cursor:pointer;min-height:44px;display:list-item;font-weight:700;align-content:center}
+.ai-demo-note summary:focus-visible{outline:3px solid #1464aa;outline-offset:4px}
+.ai-demo-note .ai-origin{font-size:12px;color:#42586c;margin:12px 0}
+.ai-demo-note ul{padding-left:20px;margin-top:10px}
+.ai-demo-note li+li{margin-top:8px}
+.ai-explanation{margin-top:16px;padding:16px;border:1px solid #c8d7e5;border-radius:12px;line-height:1.8}

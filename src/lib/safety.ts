@@ -92,8 +92,9 @@ const metaDiscussion = /(?:교육|강의|수업|발표|디자인|설명|분석|�
 const directAction = /(?:입력(?:해|하)|보내(?:주|달라|세요)|전달(?:해|하세요)|송금(?:해|하)|이체(?:해|하)|입금(?:해|하)|클릭(?:해|하)|접속(?:해|하)|설치(?:해|하)|납부(?:해|하)|말(?:해|하)세요|알려(?:주세요|주십시오)|다운로드(?:해|하)|제출(?:해|하)|신청(?:해|하))/i;
 
 export function analyzeMessage(message: string, situation: Situation): AnalysisResult {
-  const isNonActionableDiscussion = metaDiscussion.test(message) && !directAction.test(message);
-  const matches = isNonActionableDiscussion ? [] : signalRules.filter((rule) => rule.pattern.test(message));
+  const normalizedMessage = message.replace(/\s+/gu, " ");
+  const isNonActionableDiscussion = metaDiscussion.test(normalizedMessage) && !directAction.test(normalizedMessage);
+  const matches = isNonActionableDiscussion ? [] : signalRules.filter((rule) => rule.pattern.test(normalizedMessage));
   const signals = matches.map((rule) => rule.id);
   return {
     risk_level: matches.length >= 2 ? "warning" : matches.length === 1 ? "review" : "no_clear_signal",
@@ -104,4 +105,9 @@ export function analyzeMessage(message: string, situation: Situation): AnalysisR
     source: "rules_fallback",
     analysis_status: "fallback"
   };
+}
+
+/** Fixed server-owned labels only. Never use submitted text as AI context. */
+export function getSignalReasons(ids: readonly SignalId[]) {
+  return signalRules.filter((rule) => ids.includes(rule.id)).map(({ id, reason }) => ({ id, reason }));
 }

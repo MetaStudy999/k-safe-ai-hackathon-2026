@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { analyzeMessage, isSituation, redactMessage } from "@/lib/safety";
 import { readBoundedJson, RequestBodyError } from "@/lib/request-guard";
 import { canUseAnalyzeApi } from "@/lib/deployment-gate";
+import { explainAnalysis } from "@/lib/ai-explanation";
 
 export async function POST(request: Request) {
   // 공개 배포에서는 WAF의 실제 요청률 제한을 검증하기 전까지 분석 API 차단.
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const safeMessage = redactMessage(input.message);
-  const result = analyzeMessage(safeMessage, input.situation);
+  const result = await explainAnalysis(analyzeMessage(safeMessage, input.situation), input.situation);
   return NextResponse.json(result, {
     headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" }
   });
