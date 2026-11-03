@@ -641,8 +641,8 @@ export default function PublicDemo() {
           <span>안전수칙</span>
         </a>
         <a href="#help">
-          <Icon name="question" />
-          <span>도움받기</span>
+          <Icon name="call" />
+          <span>긴급전화</span>
         </a>
         <ShareButton onClick={sharePage} />
         <button type="button" onClick={() => openDialog("about")}>
