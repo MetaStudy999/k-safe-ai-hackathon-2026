@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Brand from "./brand";
-import { useGuideSpeech } from "./use-guide-speech";
+import { GUIDE_AUDIO, useGuideSpeech } from "./use-guide-speech";
 import {
   PUBLIC_DEMO_SCENARIOS,
   LINK_FOLLOW_UPS,
@@ -214,9 +214,9 @@ const PUBLIC_SHARE = {
 };
 
 const speechMessages = {
-  idle: "송금 전을 선택하면 안내 음성이 재생됩니다.",
+  idle: "상황을 선택하면 안내 음성이 재생됩니다.",
   loading: "안내 음성을 준비하고 있습니다.",
-  playing: "송금 전 안내 음성을 재생하고 있습니다.",
+  playing: "안내 음성을 재생하고 있습니다.",
   finished: "안내 음성이 끝났습니다. 다시 들을 수 있습니다.",
   stopped: "음성 안내를 중지했습니다.",
   error: "음성을 재생하지 못했습니다. 기기의 소리 설정을 확인한 뒤 다시 듣기를 누르거나 아래 글 안내를 확인해 주세요.",
@@ -250,8 +250,8 @@ export default function PublicDemo() {
     });
   }
 
-  function changeSituation(next: PublicDemoSituation, focus = true) {
-    if (next !== "before_transfer") speech.stop();
+  function changeSituation(next: PublicDemoSituation, focus = true, playAudio = true) {
+    if (playAudio) speech.speak(GUIDE_AUDIO[next]);
     setHasSelected(true);
     setNavigation((previous) => getPublicDemoNavigation(previous, next));
     if (focus) situationGroup.current?.querySelector<HTMLInputElement>(`input[value="${next}"]`)?.focus();
@@ -305,7 +305,7 @@ export default function PublicDemo() {
             <a
               key={item.href}
               href={item.href}
-              onClick={() => { if (!hasSelected && (item.href === "#cases" || item.href === "#rules")) changeSituation("unsure", false); }}
+              onClick={() => { if (!hasSelected && (item.href === "#cases" || item.href === "#rules")) changeSituation("unsure", false, false); }}
             >
               {item.label}
             </a>
@@ -349,7 +349,7 @@ export default function PublicDemo() {
               <a
                 key={item.href}
                 href={item.href}
-                onClick={() => { setMenuOpen(false); if (!hasSelected && (item.href === "#cases" || item.href === "#rules")) changeSituation("unsure", false); }}
+                onClick={() => { setMenuOpen(false); if (!hasSelected && (item.href === "#cases" || item.href === "#rules")) changeSituation("unsure", false, false); }}
               >
                 {item.label}
               </a>
@@ -414,9 +414,9 @@ export default function PublicDemo() {
                     name="situation"
                     value={option.id}
                     checked={hasSelected && situation === option.id}
-                    onChange={() => changeSituation(option.id, false)}
+                    onChange={() => { /* Native click also covers keyboard radio activation. */ }}
                     onClick={() => {
-                      if (option.id === "before_transfer") speech.speak();
+                      changeSituation(option.id, false);
                       scrollToSituationOnMobile();
                     }}
                   />
@@ -426,12 +426,10 @@ export default function PublicDemo() {
                   <span className="situation-text">
                     <strong>
                       {option.label}
-                      {option.id === "before_transfer" && (
-                        <span className="situation-voice-hint">
+                      <span className="situation-voice-hint">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m11 4-6 5H2v6h3l6 5V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" /></svg>
                           <span className="visuallyHidden"> · 선택하면 음성 안내</span>
-                        </span>
-                      )}
+                      </span>
                     </strong>
                     <span>{option.detail}</span>
                   </span>
@@ -453,19 +451,19 @@ export default function PublicDemo() {
                 <h2 id="emergency-title">{hasSelected ? current.alertTitle : "이미 돈을 보냈다면"}</h2>
                 <strong>{hasSelected ? current.alertText : "즉시 112 또는 금융회사에 연락해 지급정지를 요청하세요."}</strong>
                 {useSafePhone && <p>의심되는 휴대폰에서는 전화하거나 비밀번호를 변경하지 마세요. 다른 안전한 전화를 사용하세요.</p>}
-                {hasSelected && situation === "before_transfer" && (
-                  <div className="guide-speech" role="group" aria-label="송금 전 음성 안내">
-                    <div className="guide-speech-buttons">
-                      <button type="button" onClick={() => speech.speak()}>안내 음성 다시 듣기</button>
-                      <button type="button" onClick={speech.stop} disabled={!speechActive}>음성 중지</button>
-                    </div>
-                    <p role="status" aria-live="polite" aria-atomic="true">{speechMessages[speech.status]}</p>
-                    <p>AI가 만든 한국어 안내 음성입니다.</p>
-                  </div>
-                )}
               </div>
             </div>
             <ContactButtons onBank={() => openDialog("bank")} safePhoneOnly={useSafePhone} />
+            {hasSelected && (
+              <div className="guide-speech" role="group" aria-label={`${current.label} 음성 안내`}>
+                <div className="guide-speech-buttons">
+                  <button type="button" aria-label={`${current.label} 안내 음성 다시 듣기`} onClick={() => speech.speak(GUIDE_AUDIO[situation])}>안내 음성 다시 듣기</button>
+                  <button type="button" aria-label={`${current.label} 음성 중지`} onClick={speech.stop} disabled={!speechActive}>음성 중지</button>
+                </div>
+                <p role="status" aria-live="polite" aria-atomic="true">{current.label}: {speechMessages[speech.status]}</p>
+                <p>AI가 만든 한국어 안내 음성입니다.</p>
+              </div>
+            )}
           </section>
           {!hasSelected && (
             <p className="selection-prompt" role="status">아직 상황을 선택하지 않았습니다. 위에서 내 상황을 고르면 행동 안내와 가상 사례를 확인할 수 있습니다.</p>
@@ -487,7 +485,7 @@ export default function PublicDemo() {
                 </p>
               )}
               {situation === "shared_information" ? (
-                <SharedInformationGuide onInstalledApp={() => changeSituation("installed_app")} />
+                <SharedInformationGuide onKindChange={speech.stop} onInstalledApp={() => changeSituation("installed_app")} />
               ) : (
                 <ActionList situation={situation} steps={current.steps} actions={actions} />
               )}
@@ -666,11 +664,11 @@ export default function PublicDemo() {
           <Icon name="home" />
           <span>홈</span>
         </a>
-        <a href="#cases" onClick={() => { if (!hasSelected) changeSituation("unsure", false); }}>
+        <a href="#cases" onClick={() => { if (!hasSelected) changeSituation("unsure", false, false); }}>
           <Icon name="guide" />
           <span>사례보기</span>
         </a>
-        <a href="#rules" onClick={() => { if (!hasSelected) changeSituation("unsure", false); }}>
+        <a href="#rules" onClick={() => { if (!hasSelected) changeSituation("unsure", false, false); }}>
           <Icon name="shield" />
           <span>안전수칙</span>
         </a>
@@ -821,7 +819,7 @@ function FollowUpButton({ label, onClick, urgent = false, icon = "phone" }: {
 }
 
 // Mount only for this situation, so leaving it also clears the local selection.
-function SharedInformationGuide({ onInstalledApp }: { onInstalledApp: () => void }) {
+function SharedInformationGuide({ onInstalledApp, onKindChange }: { onInstalledApp: () => void; onKindChange: () => void }) {
   const [kind, setKind] = useState<SharedInformationKind | null>(null);
   const guide = getSharedInformationGuide(kind);
 
@@ -840,7 +838,7 @@ function SharedInformationGuide({ onInstalledApp }: { onInstalledApp: () => void
               name="shared-information-kind"
               value={option.id}
               checked={kind === option.id}
-              onChange={() => setKind(option.id)}
+              onChange={() => { onKindChange(); setKind(option.id); }}
             />
             <span>{option.label}</span>
           </label>

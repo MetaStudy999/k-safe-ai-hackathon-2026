@@ -1,9 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { BEFORE_TRANSFER_AUDIO } from "../../src/app/use-guide-speech";
+import { BEFORE_TRANSFER_AUDIO, GUIDE_AUDIO } from "../../src/app/use-guide-speech";
 
-const output = process.env.UI_ARTIFACT_DIR || "artifacts/ui/natural-guide-voice-20261104";
+const output = process.env.UI_ARTIFACT_DIR || "artifacts/ui/all-situation-voice-20261104";
 mkdirSync(output, { recursive: true });
 
 declare global {
@@ -41,7 +41,7 @@ async function observeAudio(page: Page) {
 }
 const select = (page: Page) => page.locator(".situation-card.before_transfer").click();
 const status = (page: Page) => page.locator(".guide-speech [role=status]");
-const replay = (page: Page) => page.getByRole("button", { name: "안내 음성 다시 듣기", exact: true });
+const replay = (page: Page) => page.getByRole("button", { name: /안내 음성 다시 듣기$/ });
 async function playing(page: Page) {
   await expect(status(page)).toContainText("재생하고 있습니다");
   await expect.poll(() => page.evaluate(() => window.guideAudio.at(-1)!.currentTime)).toBeGreaterThan(0.1);
@@ -85,10 +85,10 @@ for (const width of [390, 1440]) {
     const calls = await page.evaluate(() => window.guidePlayCalls);
     expect(calls).toHaveLength(3);
     expect(calls.every((call) => call.active && call.time === 0)).toBe(true);
-    await page.getByRole("button", { name: "음성 중지", exact: true }).click();
+    await page.getByRole("button", { name: /음성 중지$/ }).click();
     await expect(status(page)).toContainText("중지했습니다");
     await allPaused(page);
-    await expect(page.getByRole("button", { name: "음성 중지", exact: true })).toBeDisabled();
+    await expect(page.getByRole("button", { name: /음성 중지$/ })).toBeDisabled();
     await replay(page).click();
     await playing(page);
     // Seek near the real file's end; completion must come from native ended.
@@ -107,8 +107,8 @@ test("other situation, hidden tab and pagehide release audio", async ({ page }) 
   await select(page);
   await playing(page);
   await page.locator(".situation-card.already_transferred").click();
-  await expect(page.locator(".guide-speech")).toHaveCount(0);
-  await allPaused(page);
+  await playing(page);
+  expect(await page.evaluate(() => window.guideAudio.filter((a) => !a.paused).length)).toBe(1);
   await expect(page.locator(".mobile-emergency")).toContainText("즉시");
   for (const event of ["visibilitychange", "pagehide"]) {
     await select(page);
@@ -134,7 +134,7 @@ test("keyboard selection, stop and replay retain focus", async ({ page }) => {
   await page.keyboard.press("Space");
   await expect(radio).toBeChecked();
   await playing(page);
-  await page.getByRole("button", { name: "음성 중지", exact: true }).focus();
+  await page.getByRole("button", { name: /음성 중지$/ }).focus();
   await page.keyboard.press("Enter");
   await expect(status(page)).toContainText("중지했습니다");
   await replay(page).focus();
@@ -198,7 +198,7 @@ test("rapid replacement ignores a stale play rejection and native pause updates 
   });
   await select(page);
   await expect(status(page)).toContainText("준비하고 있습니다");
-  await replay(page).click();
+  await page.locator(".situation-card.clicked_link").click();
   await playing(page);
   await expect.poll(() => page.evaluate(() => window.guideAudio.at(-1)!.currentTime)).toBeGreaterThan(1.2);
   await expect(status(page)).toContainText("재생하고 있습니다");
@@ -232,4 +232,61 @@ test("320px: card height, emergency access, large text, contrast and accessibili
   const axe = await new AxeBuilder({ page }).analyze();
   expect(axe.violations).toEqual([]);
   await page.screenshot({ path: `${output}/large-contrast-320.png`, fullPage: true });
+});
+
+
+test("all six files decode, advance, replace, restart and stop; safe phone and information changes", async ({ page }) => {
+  await observeAudio(page);
+  await page.goto("/");
+  expect(await page.evaluate(() => window.guideAudio.length)).toBe(0);
+  const decoded = [];
+  for (const [situation, file] of Object.entries(GUIDE_AUDIO)) {
+    await page.locator(`.situation-card.${situation}`).click();
+    await playing(page);
+    const media = await page.evaluate(() => {
+      const audio = window.guideAudio.at(-1)!;
+      return { src: new URL(audio.src).pathname, duration: audio.duration, readyState: audio.readyState, error: audio.error?.code ?? null, active: window.guideAudio.filter(a => !a.paused).length };
+    });
+    expect(media.src).toBe(file);
+    expect(media.duration).toBeGreaterThan(10);
+    expect(media.readyState).toBeGreaterThanOrEqual(2);
+    expect(media.error).toBeNull();
+    expect(media.active).toBe(1);
+    decoded.push({ situation, ...media });
+    await page.locator(`.situation-card.${situation}`).click();
+    await playing(page);
+    expect(await page.evaluate(() => window.guidePlayCalls.at(-1)!.time)).toBe(0);
+    await replay(page).click();
+    await playing(page);
+    expect(await page.evaluate(() => window.guidePlayCalls.at(-1)!.time)).toBe(0);
+    await page.getByRole("button", { name: /음성 중지$/ }).click();
+    await allPaused(page);
+  }
+  await page.locator(".situation-card.installed_app").click();
+  await page.getByRole("button", { name: "이미 돈도 보냈어요 → 긴급 안내", exact: true }).click();
+  await playing(page);
+  await expect(page.locator(".mobile-emergency")).toContainText("다른 안전한 전화");
+  await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
+  expect(await page.evaluate(() => new URL(window.guideAudio.at(-1)!.src).pathname)).toBe(GUIDE_AUDIO.already_transferred);
+  await page.locator(".situation-card.shared_information").click();
+  await playing(page);
+  await page.locator('input[name="shared-information-kind"][value="card"]').check();
+  await expect(status(page)).toContainText("중지했습니다");
+  await allPaused(page);
+  await page.locator('input[value="clicked_link"]').focus();
+  await page.keyboard.press("Space");
+  await playing(page);
+  expect(await page.evaluate(() => new URL(window.guideAudio.at(-1)!.src).pathname)).toBe(GUIDE_AUDIO.clicked_link);
+  await page.keyboard.press("ArrowLeft");
+  await playing(page);
+  expect(await page.evaluate(() => new URL(window.guideAudio.at(-1)!.src).pathname)).toBe(GUIDE_AUDIO.shared_information);
+  writeFileSync(`${output}/all-situation-decode.json`, JSON.stringify(decoded, null, 2));
+});
+
+
+test("general navigation never starts audio", async ({ page }) => {
+  await observeAudio(page);
+  await page.goto("/");
+  await page.locator('.desktop-nav a[href="#rules"]').click();
+  expect(await page.evaluate(() => window.guideAudio.length)).toBe(0);
 });

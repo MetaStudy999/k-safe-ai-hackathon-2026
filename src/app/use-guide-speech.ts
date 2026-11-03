@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const BEFORE_TRANSFER_AUDIO = "/audio/before-transfer-ko-sunhi-v1-20261104.mp3";
+export const GUIDE_AUDIO = {
+  before_transfer: BEFORE_TRANSFER_AUDIO,
+  already_transferred: "/audio/already-transferred-ko-sunhi-v1-20261104.mp3",
+  installed_app: "/audio/installed-app-ko-sunhi-v1-20261104.mp3",
+  unsure: "/audio/unsure-ko-sunhi-v1-20261104.mp3",
+  shared_information: "/audio/shared-information-ko-sunhi-v1-20261104.mp3",
+  clicked_link: "/audio/clicked-link-ko-sunhi-v1-20261104.mp3",
+} as const;
 type SpeechStatus = "idle" | "loading" | "playing" | "finished" | "stopped" | "error";
 
 export function useGuideSpeech() {
@@ -33,11 +41,11 @@ export function useGuideSpeech() {
     setStatus("stopped");
   }, [cancel]);
 
-  const speak = useCallback(() => {
+  const speak = useCallback((source: string) => {
     cancel();
     try {
       // A fresh element starts at zero and cannot inherit events from a previous run.
-      const audio = new Audio(BEFORE_TRANSFER_AUDIO);
+      const audio = new Audio(source);
       audioRef.current = audio;
       const current = () => audioRef.current === audio;
       const fail = () => {

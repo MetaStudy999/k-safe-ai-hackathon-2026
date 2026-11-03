@@ -2798,3 +2798,6 @@ p {
 .public-site .guide-speech p { font-size: 14px; overflow-wrap: anywhere; }
 .public-site.high-contrast .guide-speech button { border-width: 2px; }
 .public-site.large-text .guide-speech :is(button, p) { font-size: 18px; }
+
+/* Keep emergency contacts ahead of audio controls. */
+.public-site .mobile-emergency > .guide-speech { grid-column: 1 / -1; }
