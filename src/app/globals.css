@@ -2787,3 +2787,14 @@ p {
     overscroll-behavior: contain;
   }
 }
+
+/* Speech controls stay beside the selected guidance at every screen size. */
+.public-site .situation-voice-hint { display: inline-flex; margin-left: 4px; color: #1846a0; vertical-align: middle; }
+.public-site .guide-speech { margin-top: 12px; }
+.public-site .guide-speech-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.public-site .guide-speech button { min-height: 44px; padding: 9px 12px; border: 1px solid #425371; border-radius: 8px; background: #fff; color: #18233c; font: inherit; font-size: 14px; line-height: 1.5; font-weight: 700; cursor: pointer; }
+.public-site .guide-speech button:disabled { color: #58647b; border-color: #8290a6; background: #f0f2f6; cursor: default; }
+.public-site .guide-speech button:focus-visible { outline: 3px solid #184ec5; outline-offset: 3px; }
+.public-site .guide-speech p { font-size: 14px; overflow-wrap: anywhere; }
+.public-site.high-contrast .guide-speech button { border-width: 2px; }
+.public-site.large-text .guide-speech :is(button, p) { font-size: 18px; }
