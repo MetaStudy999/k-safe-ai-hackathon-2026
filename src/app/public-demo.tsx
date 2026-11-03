@@ -1,8 +1,22 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { PUBLIC_DEMO_SCENARIOS, getPublicDemoActions } from "@/lib/public-demo";
-import type { Situation } from "@/lib/safety";
+import Brand from "./brand";
+import {
+  PUBLIC_DEMO_SCENARIOS,
+  LINK_FOLLOW_UPS,
+  TRANSFER_FOLLOW_UP,
+  ACCOUNT_DAMAGE_GUIDANCE,
+  GUIDE_SOURCES,
+  SHARED_INFORMATION_GUIDES,
+  getPublicDemoActions,
+  getPublicDemoNavigation,
+  getPublicDemoPrecautions,
+  getSharedInformationGuide,
+  type SharedInformationKind,
+  type PublicDemoSituation,
+  type PublicDemoNavigation,
+} from "@/lib/public-demo";
 
 const paths: Record<string, React.ReactNode> = {
   send: <path d="m3 10 18-7-7 18-3-7-8-4Zm8 4L21 3" />,
@@ -126,36 +140,6 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
   );
 }
 
-function Brand() {
-  return (
-    <a className="brand" href="#home" aria-label="K-SAFE 국민안심 AI 홈">
-      <svg className="brand-shield" viewBox="0 0 36 42" aria-hidden="true">
-        <defs>
-          <linearGradient id="brand-blue">
-            <stop stopColor="#45baff" />
-            <stop offset="1" stopColor="#1547ff" />
-          </linearGradient>
-        </defs>
-        <path
-          fill="url(#brand-blue)"
-          d="M18 1c5 5 10 6 16 7v15c0 9-9 15-16 19C11 38 2 32 2 23V8c6-1 11-2 16-7Z"
-        />
-        <path
-          fill="#fff"
-          d="M18 10c3 2 6 3 9 4v9c0 5-5 9-9 12-4-3-9-7-9-12v-9c3-1 6-2 9-4Z"
-        />
-        <path fill="#d2efff" d="M18 10v25c-4-3-9-7-9-12v-9c3-1 6-2 9-4Z" />
-      </svg>
-      <span>
-        K-SAFE{" "}
-        <small>
-          국민안심 <b>AI</b>
-        </small>
-      </span>
-    </a>
-  );
-}
-
 function DemoBadge() {
   return (
     <div className="demo-notice">
@@ -223,13 +207,23 @@ const navItems = [
 ];
 
 export default function PublicDemo() {
-  const [situation, setSituation] = useState<Situation>("already_transferred");
+  const [{ situation, useSafePhone }, setNavigation] = useState<PublicDemoNavigation>({ situation: "unsure", useSafePhone: false });
+  const [hasSelected, setHasSelected] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
+  const [largeText, setLargeText] = useState(false);
   const [dialogKind, setDialogKind] = useState<"about" | "bank">("about");
   const dialog = useRef<HTMLDialogElement>(null);
+  const situationGroup = useRef<HTMLFieldSetElement>(null);
   const current = PUBLIC_DEMO_SCENARIOS.find((item) => item.id === situation)!;
   const actions = getPublicDemoActions(situation);
+  const precautions = getPublicDemoPrecautions(situation);
+
+  function changeSituation(next: PublicDemoSituation, focus = true) {
+    setHasSelected(true);
+    setNavigation((previous) => getPublicDemoNavigation(previous, next));
+    if (focus) situationGroup.current?.querySelector<HTMLInputElement>(`input[value="${next}"]`)?.focus();
+  }
 
   function openDialog(kind: "about" | "bank") {
     setDialogKind(kind);
@@ -239,7 +233,7 @@ export default function PublicDemo() {
 
   return (
     <div
-      className={`public-site${highContrast ? " high-contrast" : ""}`}
+      className={`public-site${highContrast ? " high-contrast" : ""}${largeText ? " large-text" : ""}`}
       id="home"
     >
       <a className="skip-link" href="#guide">
@@ -255,7 +249,7 @@ export default function PublicDemo() {
             <a
               key={item.href}
               href={item.href}
-              className={item.href === "#home" ? "active" : ""}
+              onClick={() => { if (!hasSelected && (item.href === "#cases" || item.href === "#rules")) changeSituation("unsure", false); }}
             >
               {item.label}
             </a>
@@ -275,7 +269,7 @@ export default function PublicDemo() {
             <Icon name="sun" />
           </button>
           <a href="#guide" className="check-button">
-            지금 안전하게 확인하기 <span aria-hidden="true">→</span>
+            내 상황 선택하기 <span aria-hidden="true">→</span>
           </a>
         </div>
         <button
@@ -298,13 +292,19 @@ export default function PublicDemo() {
               <a
                 key={item.href}
                 href={item.href}
-                onClick={() => setMenuOpen(false)}
+                onClick={() => { setMenuOpen(false); if (!hasSelected && (item.href === "#cases" || item.href === "#rules")) changeSituation("unsure", false); }}
               >
                 {item.label}
               </a>
             ))}
             <button type="button" onClick={() => openDialog("about")}>
               서비스 소개 · 개인정보 보호
+            </button>
+            <button type="button" aria-pressed={highContrast} onClick={() => setHighContrast((value) => !value)}>
+              화면 대비 높이기
+            </button>
+            <button type="button" aria-pressed={largeText} onClick={() => setLargeText((value) => !value)}>
+              글자 크게 보기
             </button>
           </nav>
         )}
@@ -345,19 +345,19 @@ export default function PublicDemo() {
               </h2>
               <p>지금 어떤 상황이신가요? 아래에서 선택해 주세요.</p>
             </div>
-            <fieldset className="situation-grid">
+            <fieldset className="situation-grid" ref={situationGroup}>
               <legend className="visuallyHidden">현재 상황 선택</legend>
               {PUBLIC_DEMO_SCENARIOS.map((option) => (
                 <label
                   key={option.id}
-                  className={`situation-card ${option.id}${situation === option.id ? " selected" : ""}`}
+                  className={`situation-card ${option.id}${hasSelected && situation === option.id ? " selected" : ""}`}
                 >
                   <input
                     type="radio"
                     name="situation"
                     value={option.id}
-                    checked={situation === option.id}
-                    onChange={() => setSituation(option.id)}
+                    checked={hasSelected && situation === option.id}
+                    onChange={() => changeSituation(option.id, false)}
                   />
                   <span className="situation-icon">
                     <Icon name={option.icon} />
@@ -374,25 +374,63 @@ export default function PublicDemo() {
             </fieldset>
           </section>
           <section
-            className={`mobile-emergency ${situation}`}
+            className={`mobile-emergency ${hasSelected ? situation : "is-initial"}`}
             aria-labelledby="emergency-title"
             aria-live="polite"
           >
             <div className="emergency-heading">
               <Icon name="bell" />
               <div>
-                <h2 id="emergency-title">{current.alertTitle}</h2>
-                <strong>{current.alertText}</strong>
-                <p>
-                  {situation === "already_transferred"
-                    ? "추가 피해를 막기 위해 신속한 신고와 지급정지가 중요합니다."
-                    : "문자 속 연락처 대신 공식 상담 창구를 이용하세요."}
-                </p>
+                <h2 id="emergency-title">{hasSelected ? current.alertTitle : "이미 돈을 보냈다면"}</h2>
+                <strong>{hasSelected ? current.alertText : "즉시 112 또는 금융회사에 연락해 지급정지를 요청하세요."}</strong>
+                {useSafePhone && <p>의심되는 휴대폰에서는 전화하거나 비밀번호를 변경하지 마세요. 다른 안전한 전화를 사용하세요.</p>}
               </div>
             </div>
-            <ContactButtons onBank={() => openDialog("bank")} />
+            <ContactButtons onBank={() => openDialog("bank")} safePhoneOnly={useSafePhone} />
           </section>
-          <div className="detail-grid" aria-live="polite" aria-atomic="true">
+          {!hasSelected && (
+            <p className="selection-prompt" role="status">아직 상황을 선택하지 않았습니다. 위에서 내 상황을 고르면 행동 안내와 가상 사례를 확인할 수 있습니다.</p>
+          )}
+          <div className="detail-grid" hidden={!hasSelected} aria-live={situation === "shared_information" ? undefined : "polite"} aria-atomic="true">
+            <section
+              className="action-panel"
+              id="rules"
+              aria-labelledby="action-title"
+            >
+              <div className="panel-heading">
+                <span className="action-title-icon">↟</span>
+                <h2 id="action-title">지금 이렇게 하세요</h2>
+                <p>{situation === "installed_app" ? current.alertText : "안전한 대응을 위한 권장 행동입니다."}</p>
+              </div>
+              {situation === "already_transferred" && useSafePhone && (
+                <p className="information-priority" role="alert">
+                  의심 앱도 설치했다면 다른 안전한 전화로 112 또는 금융회사에 지급정지를 먼저 요청하세요. 의심되는 휴대폰으로 전화하지 말고 AI 분석이나 앱 점검을 기다리지 마세요.
+                </p>
+              )}
+              {situation === "shared_information" ? (
+                <SharedInformationGuide onInstalledApp={() => changeSituation("installed_app")} />
+              ) : (
+                <ActionList situation={situation} steps={current.steps} actions={actions} />
+              )}
+              {situation === "clicked_link" && (
+                <div className="link-follow-ups" role="group" aria-label="링크 클릭 후 추가로 한 행동">
+                  <p className="information-note">해당하는 행동을 골라 다음 안내를 확인하세요. 버튼은 이 화면의 상황만 바꾸며 정보를 전송하거나 외부 신고를 접수하지 않습니다.</p>
+                  {LINK_FOLLOW_UPS.map((followUp) => (
+                    <button className="information-app" key={followUp.situation} type="button" onClick={() => changeSituation(followUp.situation)}>
+                      {followUp.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {situation !== "already_transferred" && situation !== "clicked_link" && (
+                <div className="link-follow-ups">
+                  <button className="information-app" type="button" onClick={() => changeSituation(TRANSFER_FOLLOW_UP.situation)}>
+                    {TRANSFER_FOLLOW_UP.label}
+                  </button>
+                  <p className="information-note">이 화면의 상황만 바꾸며 정보를 전송하거나 신고를 접수하지 않습니다.</p>
+                </div>
+              )}
+            </section>
             <section
               className="case-panel"
               id="cases"
@@ -413,7 +451,7 @@ export default function PublicDemo() {
                 </div>
                 <div className="clues">
                   <h3>
-                    <span aria-hidden="true">!</span> 이런 점이 의심스러워요!
+                    <span aria-hidden="true">!</span> 가상 문구에서 확인한 요청
                   </h3>
                   <div className="clue-grid">
                     {current.clues.map((clue) => (
@@ -429,42 +467,13 @@ export default function PublicDemo() {
                     ))}
                   </div>
                 </div>
+                {precautions.length > 0 && (
+                  <div className="information-note general-precautions">
+                    <h3>일반 주의사항</h3>
+                    {precautions.map((text) => <p key={text}>{text}</p>)}
+                  </div>
+                )}
               </div>
-            </section>
-            <section
-              className="action-panel"
-              id="rules"
-              aria-labelledby="action-title"
-            >
-              <div className="panel-heading">
-                <span className="action-title-icon">↟</span>
-                <h2 id="action-title">지금 이렇게 하세요</h2>
-                <p>안전한 대응을 위한 권장 행동입니다.</p>
-              </div>
-              <ol className="action-list">
-                {current.steps.map((step, i) => (
-                  <li key={`${situation}-${i}`}>
-                    <span className="action-number">{i + 1}</span>
-                    <span className={`action-icon action-icon-${i}`}>
-                      <Icon
-                        name={
-                          i === 0
-                            ? situation === "already_transferred"
-                              ? "call"
-                              : "shield"
-                            : i === 1
-                              ? "bank"
-                              : "document"
-                        }
-                      />
-                    </span>
-                    <div>
-                      <h3>{step}</h3>
-                      <p>{actions[i]}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
             </section>
           </div>
           <section
@@ -476,11 +485,11 @@ export default function PublicDemo() {
               <Icon name="shield" />
               <div>
                 <h2 id="contacts-title">공식 상담 및 신고 채널</h2>
-                <p>언제든지 도움을 받을 수 있습니다.</p>
+                <p>{useSafePhone ? "다른 안전한 전화로 연락하세요. 이미 송금했다면 지급정지 요청이 먼저입니다." : "언제든지 도움을 받을 수 있습니다."}</p>
               </div>
             </div>
             <div className="desktop-contacts">
-              <a className="contact-card police" href="tel:112">
+              <a className="contact-card police" href={useSafePhone ? undefined : "tel:112"}>
                 <span className="contact-icon">
                   <Icon name="call" />
                 </span>
@@ -489,17 +498,6 @@ export default function PublicDemo() {
                   <b>경찰청</b>
                   <span>긴급 신고</span>
                   <small>(보이스피싱, 스미싱 등)</small>
-                </span>
-              </a>
-              <a className="contact-card hotline" href="tel:118">
-                <span className="contact-icon">
-                  <Icon name="call" />
-                </span>
-                <strong>118</strong>
-                <span>
-                  <b>스미싱·인터넷침해 상담</b>
-                  <span>금융사기 의심 문자 등</span>
-                  <small>(국번 없이 118)</small>
                 </span>
               </a>
               <button
@@ -511,17 +509,48 @@ export default function PublicDemo() {
                   <Icon name="bank" />
                 </span>
                 <span>
-                  <b>금융회사 고객센터</b>
+                  <b>금융회사 연락 방법 보기</b>
                   <span>이용 중인 은행에</span>
                   <span>지급정지 등 긴급 조치 요청</span>
                 </span>
                 <Icon name="arrow" />
               </button>
+              <a className="contact-card hotline" href={useSafePhone ? undefined : "tel:1394"}>
+                <span className="contact-icon">
+                  <Icon name="call" />
+                </span>
+                <strong>1394</strong>
+                <span>
+                  <b>금융사기 의심 상담·제보</b>
+                  <small>(국번 없이 1394)</small>
+                </span>
+              </a>
+              <a className="contact-card hotline" href={useSafePhone ? undefined : "tel:118"}>
+                <span className="contact-icon">
+                  <Icon name="call" />
+                </span>
+                <strong>118</strong>
+                <span>
+                  <b>스미싱·인터넷침해 상담</b>
+                  <small>(국번 없이 118)</small>
+                </span>
+              </a>
             </div>
             <div className="mobile-contacts">
-              <ContactButtons onBank={() => openDialog("bank")} />
+              <ContactButtons onBank={() => openDialog("bank")} safePhoneOnly={useSafePhone} />
             </div>
           </section>
+          <details className="guide-details guide-sources">
+            <summary>안내 출처 · 공식 원문</summary>
+            <p>일반 행동안내의 근거 자료입니다. 이 앱의 사기 판정이나 피해 처리 결과를 뜻하지 않습니다.</p>
+            {GUIDE_SOURCES.map((source) => (
+              <p key={source.href}>
+                <strong>{source.agency}</strong><br />
+                <a href={source.href} target="_blank" rel="noopener noreferrer">{source.title} · 공식 원문 (새 창)</a><br />
+                {source.publishedAt ? `자료 발표일 ${source.publishedAt}` : "자료 발표일 미표시"} · 최종 확인일 {source.checkedAt}
+              </p>
+            ))}
+          </details>
         </div>
         <footer className="site-footer">
           <p>
@@ -543,11 +572,11 @@ export default function PublicDemo() {
           <Icon name="home" />
           <span>홈</span>
         </a>
-        <a href="#cases">
+        <a href="#cases" onClick={() => { if (!hasSelected) changeSituation("unsure", false); }}>
           <Icon name="guide" />
           <span>사례보기</span>
         </a>
-        <a href="#rules">
+        <a href="#rules" onClick={() => { if (!hasSelected) changeSituation("unsure", false); }}>
           <Icon name="shield" />
           <span>안전수칙</span>
         </a>
@@ -569,7 +598,7 @@ export default function PublicDemo() {
           <Icon name={dialogKind === "bank" ? "bank" : "shield"} />
           <h2 id="dialog-title">
             {dialogKind === "bank"
-              ? "거래 금융회사에 연락하기"
+              ? "금융회사 연락 방법"
               : "K-SAFE 국민안심 AI"}
           </h2>
           <button
@@ -584,6 +613,7 @@ export default function PublicDemo() {
         {dialogKind === "bank" ? (
           <>
             <p>
+              의심 앱을 설치했다면 다른 안전한 전화·기기로 확인하세요.
               거래 중인 금융회사의 공식 앱, 카드 뒷면 또는 공식 홈페이지에서
               고객센터 대표번호를 확인해 직접 연락하세요.
             </p>
@@ -595,9 +625,9 @@ export default function PublicDemo() {
               문자에 적힌 번호나 상대방이 알려준 연락처는 이용하지 마세요.
               K-SAFE는 금융회사를 대신해 지급정지나 신고를 접수하지 않습니다.
             </p>
-            <a className="dialog-call" href="tel:112">
+            <a className="dialog-call" href={useSafePhone ? undefined : "tel:112"}>
               <Icon name="call" />
-              112 긴급 신고하기
+              {useSafePhone ? "다른 안전한 전화로 112 신고" : "112 긴급 신고하기"}
             </a>
           </>
         ) : (
@@ -608,7 +638,7 @@ export default function PublicDemo() {
             </p>
             <p>
               <strong>가상 사례 시연 · 실제 AI 분석 아님</strong>
-              <br />네 가지 합성 사례와 사전에 준비된 안전수칙을 보여 줍니다.
+              <br />여섯 가지 합성 사례와 사전에 준비된 안전수칙을 보여 줍니다.
               실제 메시지를 분석하거나 사기 여부를 확정하지 않습니다.
             </p>
             <h3>개인정보 보호</h3>
@@ -619,6 +649,7 @@ export default function PublicDemo() {
             </p>
             <p>
               실제 피해가 의심되면 즉시 112와 거래 금융회사에 연락하세요.
+              금융사기 의심 상담·제보는 1394,
               스미싱·인터넷침해 상담은 118을 이용하세요.
             </p>
           </>
@@ -635,26 +666,127 @@ export default function PublicDemo() {
   );
 }
 
-function ContactButtons({ onBank }: { onBank: () => void }) {
+// Mount only for this situation, so leaving it also clears the local selection.
+function SharedInformationGuide({ onInstalledApp }: { onInstalledApp: () => void }) {
+  const [kind, setKind] = useState<SharedInformationKind | null>(null);
+  const guide = getSharedInformationGuide(kind);
+
+  return (
+    <div className="information-guide">
+      <fieldset className="information-options" aria-describedby="information-privacy">
+        <legend>어떤 정보를 알려주셨나요?</legend>
+        <p id="information-privacy">
+          정보 종류만 선택하세요. 실제 개인정보·계좌번호는 입력하지 마세요.
+          선택은 이 화면에서만 사용하며 전송·저장하지 않습니다.
+        </p>
+        {SHARED_INFORMATION_GUIDES.map((option) => (
+          <label key={option.id}>
+            <input
+              type="radio"
+              name="shared-information-kind"
+              value={option.id}
+              checked={kind === option.id}
+              onChange={() => setKind(option.id)}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </fieldset>
+      <div aria-live="polite" aria-atomic="true">
+        <ActionList situation="shared_information" steps={guide.steps} actions={guide.actions} />
+        {kind === "identity" && (
+          <p className="information-note">
+            <a href="https://pd.fss.or.kr/" target="_blank" rel="noopener noreferrer">금융감독원 개인정보노출자 사고예방시스템 안내</a>
+          </p>
+        )}
+      </div>
+      <p className="information-priority">
+        {ACCOUNT_DAMAGE_GUIDANCE}
+      </p>
+      <button className="information-app" type="button" onClick={onInstalledApp}>
+        의심 앱도 설치했다면 앱 설치 후 안내 보기 →
+      </button>
+      <details className="guide-details additional-prevention">
+        <summary>추가 피해 예방 · 노출자 등록과 안심차단</summary>
+        <p>계좌 피해의 긴급 지급정지와 별개인 예방서비스입니다. 이미 송금했거나 모르는 계좌 출금이 있다면 먼저 112 또는 금융회사에 연락하세요.</p>
+        <dl>
+          <dt>개인정보노출자 사고예방시스템</dt>
+          <dd>노출 사실을 등록하면 금융회사와 공유해 신규 계좌개설·신용카드 발급 등에서 명의도용을 예방하도록 돕습니다. 금융감독원 공식 경로에서 등록·해제 안내를 확인하세요.</dd>
+          <dt>여신거래 안심차단</dt>
+          <dd>신용대출·카드론·신용카드 발급 등 새로운 여신거래를 차단합니다.</dd>
+          <dt>비대면 계좌개설 안심차단</dt>
+          <dd>본인 명의의 비대면 계좌개설을 차단합니다.</dd>
+          <dt>오픈뱅킹 안심차단</dt>
+          <dd>오픈뱅킹을 통한 계좌정보 조회·이체 등을 차단합니다.</dd>
+        </dl>
+        <p>안심차단은 은행 공식 앱·금융회사 영업점·<a href="https://www.payinfo.or.kr/" target="_blank" rel="noopener noreferrer">내계좌한눈에 (공식, 새 창)</a>에서 서비스별 신청 경로를 확인하세요. 해제가 필요하면 금융회사 영업점에서 절차를 확인하세요. 정상적인 새 금융거래도 제한될 수 있습니다.</p>
+        <p><a href="https://pd.fss.or.kr/" target="_blank" rel="noopener noreferrer">개인정보노출자 등록·해제 공식 안내 (새 창)</a></p>
+        <p>이 앱은 신청·해제를 접수하지 않으며 피해금 회수나 환급을 보장하지 않습니다. 의심 앱도 설치했다면 다른 안전한 기기로 공식 경로를 확인하세요.</p>
+      </details>
+      <p className="information-note">일반적인 행동안내입니다. 실제 신고나 보호 조치가 접수되는 것은 아닙니다.</p>
+    </div>
+  );
+}
+
+function ActionList({ situation, steps, actions }: {
+  situation: PublicDemoSituation;
+  steps: readonly string[];
+  actions: readonly string[];
+}) {
+  return (
+    <ol className="action-list">
+      {steps.map((step, i) => (
+        <li key={`${situation}-${i}`}>
+          <span className="action-number">{i + 1}</span>
+          <span className={`action-icon action-icon-${i}`}>
+            <Icon
+              name={
+                i === 0
+                  ? situation === "already_transferred"
+                    ? "call"
+                    : "shield"
+                  : i === 1
+                    ? "bank"
+                    : "document"
+              }
+            />
+          </span>
+          <div>
+            <h3>{step}</h3>
+            <p>{actions[i]}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function ContactButtons({ onBank, safePhoneOnly = false }: { onBank: () => void; safePhoneOnly?: boolean }) {
   return (
     <div className="contact-buttons">
-      <a href="tel:112" className="emergency-link police">
+      <a href={safePhoneOnly ? undefined : "tel:112"} className="emergency-link police">
         <Icon name="call" />
         <strong>112</strong>
-        <span>긴급 신고하기</span>
+        <span>{safePhoneOnly ? "다른 안전한 전화로 신고" : "긴급 신고하기"}</span>
         <Icon name="arrow" />
       </a>
-      <a href="tel:118" className="emergency-link hotline">
+      <button type="button" className="emergency-link bank" onClick={onBank}>
+        <Icon name="bank" />
+        <span>금융회사 연락 방법 보기</span>
+        <Icon name="arrow" />
+      </button>
+      <a href={safePhoneOnly ? undefined : "tel:1394"} className="emergency-link hotline">
+        <Icon name="call" />
+        <strong>1394</strong>
+        <span>금융사기 의심 상담·제보</span>
+        <Icon name="arrow" />
+      </a>
+      <a href={safePhoneOnly ? undefined : "tel:118"} className="emergency-link hotline">
         <Icon name="call" />
         <strong>118</strong>
         <span>스미싱·인터넷침해 상담</span>
         <Icon name="arrow" />
       </a>
-      <button type="button" className="emergency-link bank" onClick={onBank}>
-        <Icon name="bank" />
-        <span>이용 중인 금융회사에 연락하기</span>
-        <Icon name="arrow" />
-      </button>
     </div>
   );
 }

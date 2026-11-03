@@ -6,8 +6,162 @@ import {
   getPublicDemoActions,
 } from "../../src/lib/public-demo";
 
-const output = "artifacts/ui/final";
+const output = process.env.UI_ARTIFACT_DIR || "artifacts/ui/main-improvements-20261103";
 mkdirSync(output, { recursive: true });
+
+test("390px: prevention disclosures, emergency shortcuts and app plus transfer warning", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const requests: string[] = [];
+  page.on("request", (request) => requests.push(request.url()));
+  const storageBefore = await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)]);
+  const shortcut = page.getByRole("button", { name: "이미 돈도 보냈어요 → 긴급 안내", exact: true });
+  for (const situation of PUBLIC_DEMO_SCENARIOS.filter((item) => item.id !== "already_transferred")) {
+    await page.locator(`.situation-card.${situation.id}`).click();
+    await expect(shortcut).toHaveCount(1);
+    await shortcut.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator('input[value="already_transferred"]')).toBeChecked();
+    await expect(page.locator('input[value="already_transferred"]')).toBeFocused();
+    await expect(shortcut).toHaveCount(0);
+    await expect(page.locator(".action-list li").first()).toContainText("지급정지");
+    if (situation.id === "installed_app") {
+      await expect(page.locator('.action-panel [role="alert"]')).toContainText("다른 안전한 전화");
+      await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
+      await page.locator(".mobile-emergency .bank").click();
+      await expect(page.locator("dialog .dialog-call")).not.toHaveAttribute("href");
+      await page.getByRole("button", { name: "닫기", exact: true }).click();
+    }
+  }
+  await page.locator(".situation-card.shared_information").click();
+  const prevention = page.locator(".additional-prevention");
+  await expect(prevention).not.toHaveAttribute("open");
+  await prevention.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(prevention).toHaveAttribute("open", "");
+  for (const label of ["개인정보노출자 사고예방시스템", "여신거래 안심차단", "비대면 계좌개설 안심차단", "오픈뱅킹 안심차단"]) await expect(prevention).toContainText(label);
+  await expect(prevention).toContainText("긴급 지급정지와 별개인 예방서비스");
+  await expect(prevention).toContainText("신청·해제를 접수하지 않으며");
+  await expect(prevention.locator('a[href="https://www.payinfo.or.kr/"]')).toHaveAttribute("rel", "noopener noreferrer");
+  const sources = page.locator(".guide-sources");
+  await expect(sources).not.toHaveAttribute("open");
+  await sources.locator("summary").click();
+  await expect(sources.getByRole("link")).toHaveCount(3);
+  await expect(sources).toContainText("자료 발표일 미표시 · 최종 확인일 2026-11-02");
+  // Check the expanded links as real touch targets, including prevention links.
+  for (const details of [prevention, sources]) {
+    expect(await details.getByRole("link").evaluateAll((links) => links.every((link) => {
+      const rect = link.getBoundingClientRect();
+      return rect.width >= 44 && rect.height >= 44;
+    }))).toBe(true);
+  }
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await expect(page.locator("input:not([type=radio]),textarea,select")).toHaveCount(0);
+  expect(await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)])).toEqual(storageBefore);
+  expect(requests).toEqual([]);
+});
+
+test("390px: sixth scenario follow-ups, information reset and local transitions", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const requests: string[] = [];
+  page.on("request", (request) => requests.push(request.url()));
+  const storageBefore = await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)]);
+  const information = page.getByRole("group", { name: "어떤 정보를 알려주셨나요?" });
+  const followUps = page.getByRole("group", { name: "링크 클릭 후 추가로 한 행동" });
+  await expect(page.locator('.situation-grid input[type="radio"]')).toHaveCount(6);
+  await page.locator(".situation-card.shared_information").click();
+  await information.getByRole("radio", { name: "카드정보", exact: true }).check();
+  await page.locator(".situation-card.clicked_link").click();
+  await expect(information).toHaveCount(0);
+  await expect(followUps.getByRole("button")).toHaveCount(3);
+  await expect(page.locator(".message-example a")).toHaveCount(0);
+  await expect(page.locator(".action-list")).toContainText("안전이 확인된 것도 아닙니다");
+  await followUps.getByRole("button", { name: "정보도 입력했어요", exact: true }).click();
+  await expect(page.locator('input[value="shared_information"]')).toBeChecked();
+  await expect(page.locator('input[value="shared_information"]')).toBeFocused();
+  await expect(information.locator(":checked")).toHaveCount(0);
+  await expect(page.locator(".action-list")).toContainText("정보 종류를 고르면");
+  for (const [label, target] of [["앱도 설치했어요", "installed_app"], ["이미 돈도 보냈어요 → 긴급 안내", "already_transferred"]]) {
+    await page.locator(".situation-card.clicked_link").click();
+    await followUps.getByRole("button", { name: label, exact: true }).click();
+    await expect(page.locator(`input[value="${target}"]`)).toBeChecked();
+    await expect(page.locator(`input[value="${target}"]`)).toBeFocused();
+    if (target === "installed_app") {
+      await expect(page.locator(".official-contacts a[href]")).toHaveCount(0);
+      await expect(page.locator(".action-list li").first()).toContainText("연결");
+    } else {
+      await expect(page.locator(".action-list li").first()).toContainText("지급정지");
+    }
+  }
+  await page.locator(".situation-card.clicked_link").click();
+  await expect(page.locator("input:not([type=radio]),textarea,select")).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)])).toEqual(storageBefore);
+  expect(requests).toEqual([]);
+});
+
+for (const width of [320, 390, 1440]) {
+  test(`${width}px: information kinds, keyboard, reset and no collection`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const requests: string[] = [];
+    page.on("request", (request) => requests.push(request.url()));
+    const storageBefore = await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)]);
+    const group = page.getByRole("group", { name: "어떤 정보를 알려주셨나요?" });
+    await expect(group).toHaveCount(0);
+    await page.locator(".situation-card.shared_information").click();
+    await expect(group).toBeVisible();
+    await expect(group.getByRole("radio")).toHaveCount(4);
+    await expect(group.locator(":checked")).toHaveCount(0);
+    await expect(page.locator(".action-list")).toContainText("정보 종류를 고르면");
+    await expect(page.locator(".action-list")).not.toContainText("인증번호");
+    await expect(page.locator(".information-priority")).toContainText("이미 송금했거나 모르는 계좌 출금이 있다면 112 또는 금융회사에 즉시 연락해 지급정지를 요청");
+    await expect(page.locator("input:not([type=radio]),textarea,select")).toHaveCount(0);
+
+    await group.getByRole("radio", { name: "계좌번호만", exact: true }).focus();
+    await page.keyboard.press("Space");
+    await expect(page.locator(".action-list")).toContainText("송금이 완료되거나 계좌가 탈취됐다고 단정할 수 없습니다");
+    await page.keyboard.press("ArrowDown");
+    await expect(group.getByRole("radio", { name: "신분증·주민등록번호", exact: true })).toBeChecked();
+    await expect(page.locator(".action-list")).toContainText("개인정보노출자 사고예방시스템");
+    await expect(page.getByRole("link", { name: "금융감독원 개인정보노출자 사고예방시스템 안내" })).toHaveAttribute("href", "https://pd.fss.or.kr/");
+    await page.keyboard.press("ArrowDown");
+    await expect(group.getByRole("radio", { name: "비밀번호·인증번호", exact: true })).toBeChecked();
+    await expect(page.locator(".action-list")).toContainText("즉시 보호 조치를 요청");
+    await expect(page.locator(".action-list")).toContainText("안전한 기기");
+    await expect(page.locator(".action-list")).toContainText("비밀번호 변경만으로 해결되는 것은 아닙니다");
+    await expect(page.getByRole("link", { name: "금융감독원 개인정보노출자 사고예방시스템 안내", exact: true })).toHaveCount(0);
+    await page.keyboard.press("ArrowDown");
+    await expect(group.getByRole("radio", { name: "카드정보", exact: true })).toBeChecked();
+    await expect(page.locator(".action-list")).toContainText("사용정지·재발급");
+    await expect(page.locator(".action-list")).toContainText("본인이 사용하지 않은 승인·결제");
+    await expect(page.locator(".action-list")).not.toContainText(/환급|보장|승인취소/);
+    await expect(page.locator(".information-guide .information-note").last()).toContainText("실제 신고나 보호 조치가 접수되는 것은 아닙니다");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.locator(".information-options label").evaluateAll((labels) => labels.every((label) => label.getBoundingClientRect().height >= 44))).toBe(true);
+
+    await page.getByRole("button", { name: /의심 앱도 설치했다면/ }).click();
+    await expect(group).toHaveCount(0);
+    await expect(page.locator('input[value="installed_app"]')).toBeChecked();
+    await expect(page.locator(".official-contacts a[href]")).toHaveCount(0);
+    await page.locator(".situation-card.shared_information").click();
+    await expect(group.locator(":checked")).toHaveCount(0);
+    await expect(page.locator(".action-list")).toContainText("정보 종류를 고르면");
+    await group.getByRole("radio", { name: "카드정보", exact: true }).check();
+    await page.locator(".situation-card.already_transferred").click();
+    await expect(group).toHaveCount(0);
+    await expect(page.locator(".action-list li").first()).toContainText("지급정지");
+    await expect(page.locator('.desktop-contacts a[href="tel:1394"]')).toHaveCount(1);
+    await page.locator(".situation-card.shared_information").click();
+    await expect(group.locator(":checked")).toHaveCount(0);
+    expect(await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)])).toEqual(storageBefore);
+    expect(requests).toEqual([]);
+  });
+}
 
 for (const width of [320, 375, 390, 768, 1024, 1440]) {
   test(`${width}px: scenarios, layout, targets and browser errors`, async ({
@@ -29,9 +183,7 @@ for (const width of [320, 375, 390, 768, 1024, 1440]) {
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "의심스러운 연락",
     );
-    await expect(page.locator('input[name="situation"]:checked')).toHaveValue(
-      "already_transferred",
-    );
+    await expect(page.locator('input[name="situation"]:checked')).toHaveCount(0);
     await expect(page.locator(".hero-artwork")).toBeVisible();
     await expect(page.locator(".demo-notice")).toContainText(
       "실제 AI 분석 아님",
@@ -132,7 +284,7 @@ for (const width of [320, 375, 390, 768, 1024, 1440]) {
         .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
         .analyze();
       writeFileSync(
-        `artifacts/ui/axe-${width}.json`,
+        `${output}/axe-${width}.json`,
         JSON.stringify(results, null, 2),
       );
       expect(
@@ -166,14 +318,14 @@ test("desktop navigation, dialogs, keyboard, contrast and telephone links", asyn
       .click();
     await expect(page).toHaveURL(new RegExp(`#${item.id}$`));
   }
-  await page.getByRole("link", { name: /지금 안전하게 확인하기/ }).click();
+  await page.getByRole("link", { name: /내 상황 선택하기/ }).click();
   await expect(page).toHaveURL(/#guide$/);
   await page.getByRole("button", { name: "소개", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("dialog")).toContainText("개인정보 보호");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
-  await page.getByRole("button", { name: /금융회사 고객센터/ }).click();
+  await page.locator(".desktop-contacts").getByRole("button", { name: /금융회사 연락 방법 보기/ }).click();
   await expect(page.getByRole("dialog")).toContainText("공식 홈페이지");
   await page.getByRole("button", { name: "확인", exact: true }).click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
@@ -234,7 +386,7 @@ test("mobile menu, bottom navigation, dialog focus and telephone click dispatch"
   ).toBeFocused();
   await page
     .locator(".mobile-emergency")
-    .getByRole("button", { name: /금융회사에 연락하기/ })
+    .getByRole("button", { name: /금융회사 연락 방법 보기/ })
     .click();
   await expect(page.getByRole("dialog")).toContainText(
     "지급정지나 신고를 접수하지 않습니다",
