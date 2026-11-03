@@ -2768,3 +2768,22 @@ p {
   .public-site .footer-about { width: 100%; padding: 10px 12px; border: 1px solid #dfe6ef; background: #fff; }
   .public-site.high-contrast .footer-about { border: 2px solid #344565; }
 }
+
+/* Keep the public mobile header visible and leave room above anchor targets. */
+@media (max-width: 768px) {
+  html:has(.public-site) { scroll-padding-top: 76px; }
+  .public-site .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    background: #fff;
+    border-bottom-color: #e4ebf6;
+    box-shadow: 0 2px 12px #1835690a;
+  }
+  .public-site .mobile-menu {
+    top: calc(100% + 8px);
+    max-height: calc(100dvh - 160px - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
