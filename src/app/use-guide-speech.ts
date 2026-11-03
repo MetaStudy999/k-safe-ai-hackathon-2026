@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export const BEFORE_TRANSFER_AUDIO = "/audio/before-transfer-ko-sunhi-v1-20261104.mp3";
 export const GUIDE_AUDIO = {
   before_transfer: BEFORE_TRANSFER_AUDIO,
-  already_transferred: "/audio/already-transferred-ko-sunhi-v1-20261104.mp3",
+  already_transferred: "/audio/already-transferred-ko-sunhi-v2-20261104.mp3",
   installed_app: "/audio/installed-app-ko-sunhi-v1-20261104.mp3",
   unsure: "/audio/unsure-ko-sunhi-v1-20261104.mp3",
   shared_information: "/audio/shared-information-ko-sunhi-v1-20261104.mp3",
