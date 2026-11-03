@@ -426,20 +426,30 @@ export default function PublicDemo() {
               )}
               {situation === "clicked_link" && (
                 <div className="link-follow-ups" role="group" aria-label="링크 클릭 후 추가로 한 행동">
-                  <p className="information-note">해당하는 행동을 골라 다음 안내를 확인하세요. 버튼은 이 화면의 상황만 바꾸며 정보를 전송하거나 외부 신고를 접수하지 않습니다.</p>
+                  <h3 className="follow-up-heading">추가로 해당하는 상황이 있나요?</h3>
                   {LINK_FOLLOW_UPS.map((followUp) => (
-                    <button className="information-app" key={followUp.situation} type="button" onClick={() => changeSituation(followUp.situation)}>
-                      {followUp.label}
-                    </button>
+                    <FollowUpButton
+                      key={followUp.situation}
+                      label={followUp.label}
+                      urgent={followUp.situation === "already_transferred"}
+                      icon={followUp.situation === "installed_app" ? "phone" : "lock"}
+                      onClick={() => changeSituation(followUp.situation)}
+                    />
                   ))}
+                  <p className="information-note follow-up-note">
+                    <Icon name="info" />
+                    <span>해당하는 행동을 골라 다음 안내를 확인하세요. 버튼은 이 화면의 상황만 바꾸며 정보를 전송하거나 외부 신고를 접수하지 않습니다.</span>
+                  </p>
                 </div>
               )}
               {situation !== "already_transferred" && situation !== "clicked_link" && (
-                <div className="link-follow-ups">
-                  <button className="information-app" type="button" onClick={() => changeSituation(TRANSFER_FOLLOW_UP.situation)}>
-                    {TRANSFER_FOLLOW_UP.label}
-                  </button>
-                  <p className="information-note">이 화면의 상황만 바꾸며 정보를 전송하거나 신고를 접수하지 않습니다.</p>
+                <div className="link-follow-ups" role="group" aria-label="추가 상황 안내">
+                  <h3 className="follow-up-heading">추가로 해당하는 상황이 있나요?</h3>
+                  <FollowUpButton label={TRANSFER_FOLLOW_UP.label} urgent onClick={() => changeSituation(TRANSFER_FOLLOW_UP.situation)} />
+                  <p className="information-note follow-up-note">
+                    <Icon name="info" />
+                    <span>이 화면의 상황만 바꾸며 정보를 전송하거나 신고를 접수하지 않습니다.</span>
+                  </p>
                 </div>
               )}
             </section>
@@ -678,6 +688,25 @@ export default function PublicDemo() {
   );
 }
 
+function FollowUpButton({ label, onClick, urgent = false, icon = "phone" }: {
+  label: string;
+  onClick: () => void;
+  urgent?: boolean;
+  icon?: string;
+}) {
+  const [title, detail] = label.replace(/ →$/, "").split(" → ");
+  return (
+    <button className={`information-app${urgent ? " is-urgent" : ""}`} type="button" aria-label={label} onClick={onClick}>
+      <span className="follow-up-icon"><Icon name={urgent ? "alert" : icon} /></span>
+      <span className="follow-up-content">
+        <span className="follow-up-title">{title}</span>
+        {detail && <span className="follow-up-badge">→ {detail}</span>}
+      </span>
+      <Icon name="arrow" className="follow-up-arrow" />
+    </button>
+  );
+}
+
 // Mount only for this situation, so leaving it also clears the local selection.
 function SharedInformationGuide({ onInstalledApp }: { onInstalledApp: () => void }) {
   const [kind, setKind] = useState<SharedInformationKind | null>(null);
@@ -715,9 +744,7 @@ function SharedInformationGuide({ onInstalledApp }: { onInstalledApp: () => void
       <p className="information-priority">
         {ACCOUNT_DAMAGE_GUIDANCE}
       </p>
-      <button className="information-app" type="button" onClick={onInstalledApp}>
-        의심 앱도 설치했다면 앱 설치 후 안내 보기 →
-      </button>
+      <FollowUpButton label="의심 앱도 설치했다면 앱 설치 후 안내 보기 →" onClick={onInstalledApp} />
       <details className="guide-details additional-prevention">
         <summary>추가 피해 예방 · 노출자 등록과 안심차단</summary>
         <p>계좌 피해의 긴급 지급정지와 별개인 예방서비스입니다. 이미 송금했거나 모르는 계좌 출금이 있다면 먼저 112 또는 금융회사에 연락하세요.</p>
@@ -735,7 +762,10 @@ function SharedInformationGuide({ onInstalledApp }: { onInstalledApp: () => void
         <p><a href="https://pd.fss.or.kr/" target="_blank" rel="noopener noreferrer">개인정보노출자 등록·해제 공식 안내 (새 창)</a></p>
         <p>이 앱은 신청·해제를 접수하지 않으며 피해금 회수나 환급을 보장하지 않습니다. 의심 앱도 설치했다면 다른 안전한 기기로 공식 경로를 확인하세요.</p>
       </details>
-      <p className="information-note">일반적인 행동안내입니다. 실제 신고나 보호 조치가 접수되는 것은 아닙니다.</p>
+      <p className="information-note follow-up-note">
+        <Icon name="info" />
+        <span>일반적인 행동안내입니다. 실제 신고나 보호 조치가 접수되는 것은 아닙니다.</span>
+      </p>
     </div>
   );
 }
