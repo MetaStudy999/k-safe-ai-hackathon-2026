@@ -1,0 +1,23 @@
+import asyncio, json, hashlib, pathlib
+import edge_tts
+root=pathlib.Path(__file__).resolve().parents[3]
+out=root/'artifacts/ui/all-situation-voice-20261104'
+scripts={
+'already_transferred': '의심 앱도 설치했다면, 의심되는 휴대폰을 사용하지 말고 다른 안전한 전화로 연락하세요. 이미 돈을 보냈다면, 즉시 일 일 이 또는 금융회사에 연락해 지급정지를 요청하세요. 추가 송금이나 인증번호 전달을 멈추세요. 거래 내역과 연락 기록을 안전하게 보관하세요. 에이아이 분석이나 앱 점검을 기다리지 마세요.',
+'installed_app': '의심스러운 앱을 설치했다면, 휴대폰을 비행기 모드로 전환하거나 전원을 꺼서 연결을 끊으세요. 이미 돈을 보냈다면, 다른 안전한 전화로 일 일 이 또는 금융회사에 지급정지를 먼저 요청하세요. 에이아이 분석이나 앱 점검을 기다리지 마세요. 의심되는 휴대폰에서는 전화하거나 비밀번호를 변경하지 마세요. 스미싱과 인터넷 침해 상담은 일 일 팔, 금융사기 의심 상담은 일 삼 구 사를 이용하세요. 금융거래를 멈추고 공식 서비스센터 등에서 기기 점검을 받으세요.',
+'unsure': '어떻게 해야 할지 모르겠다면, 송금과 앱 설치, 정보 전달을 잠시 멈추세요. 인증번호도 알려주지 마세요. 문자 속 번호 대신, 공식 홈페이지에 나온 대표번호로 직접 확인하세요. 금융사기 의심 상담과 제보는 일 삼 구 사, 스미싱과 인터넷 침해 상담은 일 일 팔을 이용하세요. 이미 돈을 보냈거나 모르는 계좌 출금이 있다면, 일 일 이 또는 금융회사에 즉시 연락해 지급정지를 요청하세요.',
+'shared_information': '정보를 전달했다면, 상대방과의 연락을 멈추고 추가 정보를 알려주지 마세요. 화면에서 알려준 정보의 종류를 선택해, 그에 맞는 보호 조치를 확인하세요. 실제 개인정보나 계좌번호는 입력하지 마세요. 문자나 상대방이 알려준 번호 대신, 금융회사나 서비스의 공식 홈페이지 또는 고객센터에서 확인하세요. 이미 송금했거나 모르는 계좌 출금이 있다면, 일 일 이 또는 금융회사에 즉시 연락해 지급정지를 요청하세요.',
+'clicked_link': '문자 속 링크를 눌렀다면, 열린 페이지를 닫으세요. 링크를 눌렀다는 사실만으로 악성 앱 감염이나 계좌 탈취를 단정할 수 없으며, 안전이 확인된 것도 아닙니다. 추가 개인정보와 인증번호 입력, 앱 설치, 결제를 멈추세요. 문자 속 링크로 다시 접속하지 말고, 공식 앱이나 홈페이지에서 직접 확인하세요. 보호나라 카카오톡 채널의 스미싱 피싱 확인서비스로 확인하거나, 국번 없이 일 일 팔에 상담하세요. 정보 입력이나 앱 설치, 송금도 했다면, 화면에서 해당 상황의 안내로 이동하세요.'
+}
+(out/'scripts.json').write_text(json.dumps(scripts,ensure_ascii=False,indent=2)+'\n')
+async def generate(key, script):
+    name=key.replace('_','-')+'-ko-sunhi-v1-20261104.mp3'
+    path=root/'public/audio'/name
+    await edge_tts.Communicate(script,'ko-KR-SunHiNeural',rate='-5%').save(str(path))
+    return dict(situation=key,file='public/audio/'+name,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),bytes=path.stat().st_size,script=script)
+async def main():
+    assets=await asyncio.gather(*(generate(k,v) for k,v in scripts.items()))
+    before=root/'public/audio/before-transfer-ko-sunhi-v1-20261104.mp3'
+    assets.insert(0,dict(situation='before_transfer',file=str(before.relative_to(root)),sha256=hashlib.sha256(before.read_bytes()).hexdigest(),bytes=before.stat().st_size,existing_preserved=True))
+    (out/'generation-manifest.json').write_text(json.dumps(dict(voice='ko-KR-SunHiNeural',rate='-5%',version='v1-20261104',number_pronunciation={'112':'일 일 이','118':'일 일 팔','1394':'일 삼 구 사'},audible_listening_performed=False,assets=assets),ensure_ascii=False,indent=2)+'\n')
+asyncio.run(main())

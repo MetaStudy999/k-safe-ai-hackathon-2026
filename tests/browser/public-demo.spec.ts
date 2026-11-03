@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { BEFORE_TRANSFER_AUDIO } from "../../src/app/use-guide-speech";
+import { GUIDE_AUDIO } from "../../src/app/use-guide-speech";
 import { mkdirSync, writeFileSync } from "node:fs";
 import {
   PUBLIC_DEMO_SCENARIOS,
@@ -62,7 +62,7 @@ test("390px: prevention disclosures, emergency shortcuts and app plus transfer w
   }
   await expect(page.locator("input:not([type=radio]),textarea,select")).toHaveCount(0);
   expect(await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)])).toEqual(storageBefore);
-  expect(requests.filter((url) => url !== new URL(BEFORE_TRANSFER_AUDIO, page.url()).href)).toEqual([]);
+  expect(requests.filter((url) => !Object.values(GUIDE_AUDIO).some((path) => url === new URL(path, page.url()).href))).toEqual([]);
 });
 
 test("390px: sixth scenario follow-ups, information reset and local transitions", async ({ page }) => {
@@ -102,7 +102,7 @@ test("390px: sixth scenario follow-ups, information reset and local transitions"
   await expect(page.locator("input:not([type=radio]),textarea,select")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)])).toEqual(storageBefore);
-  expect(requests.filter((url) => url !== new URL(BEFORE_TRANSFER_AUDIO, page.url()).href)).toEqual([]);
+  expect(requests.filter((url) => !Object.values(GUIDE_AUDIO).some((path) => url === new URL(path, page.url()).href))).toEqual([]);
 });
 
 for (const width of [320, 390, 1440]) {
@@ -160,7 +160,7 @@ for (const width of [320, 390, 1440]) {
     await page.locator(".situation-card.shared_information").click();
     await expect(group.locator(":checked")).toHaveCount(0);
     expect(await page.evaluate(() => [JSON.stringify(localStorage), JSON.stringify(sessionStorage)])).toEqual(storageBefore);
-    expect(requests.filter((url) => url !== new URL(BEFORE_TRANSFER_AUDIO, page.url()).href)).toEqual([]);
+    expect(requests.filter((url) => !Object.values(GUIDE_AUDIO).some((path) => url === new URL(path, page.url()).href))).toEqual([]);
   });
 }
 
