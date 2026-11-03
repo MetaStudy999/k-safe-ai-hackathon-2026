@@ -219,11 +219,11 @@ export default function PublicDemo() {
   const actions = getPublicDemoActions(situation);
   const precautions = getPublicDemoPrecautions(situation);
 
-  function scrollToActionsOnMobile() {
+  function scrollToSituationOnMobile() {
     if (!window.matchMedia("(max-width: 768px)").matches) return;
     // Let the selected situation's guidance render before scrolling to it.
     window.requestAnimationFrame(() => {
-      document.getElementById("rules")?.scrollIntoView({
+      document.getElementById("emergency-title")?.scrollIntoView({
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
         block: "start",
       });
@@ -369,7 +369,7 @@ export default function PublicDemo() {
                     value={option.id}
                     checked={hasSelected && situation === option.id}
                     onChange={() => changeSituation(option.id, false)}
-                    onClick={scrollToActionsOnMobile}
+                    onClick={scrollToSituationOnMobile}
                   />
                   <span className="situation-icon">
                     <Icon name={option.icon} />
