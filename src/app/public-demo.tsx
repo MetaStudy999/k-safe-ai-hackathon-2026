@@ -206,13 +206,21 @@ const navItems = [
   { href: "#help", label: "도움받기" },
 ];
 
+const PUBLIC_SHARE = {
+  title: "K-SAFE 국민안심 AI",
+  text: "금융사기 예방·대응을 위한 K-SAFE 상황별 안전 안내입니다.",
+  url: "https://k-safe-ai-hackathon-2026.vercel.app/",
+};
+
 export default function PublicDemo() {
   const [{ situation, useSafePhone }, setNavigation] = useState<PublicDemoNavigation>({ situation: "unsure", useSafePhone: false });
   const [hasSelected, setHasSelected] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [largeText, setLargeText] = useState(false);
-  const [dialogKind, setDialogKind] = useState<"about" | "bank">("about");
+  const [dialogKind, setDialogKind] = useState<"about" | "bank" | "share">("about");
+  const [shareMessage, setShareMessage] = useState("");
+  const sharePending = useRef(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const situationGroup = useRef<HTMLFieldSetElement>(null);
   const current = PUBLIC_DEMO_SCENARIOS.find((item) => item.id === situation)!;
@@ -236,10 +244,34 @@ export default function PublicDemo() {
     if (focus) situationGroup.current?.querySelector<HTMLInputElement>(`input[value="${next}"]`)?.focus();
   }
 
-  function openDialog(kind: "about" | "bank") {
+  function openDialog(kind: "about" | "bank" | "share") {
     setDialogKind(kind);
     setMenuOpen(false);
     dialog.current?.showModal();
+  }
+
+  async function sharePage() {
+    if (sharePending.current) return;
+    sharePending.current = true;
+    setShareMessage("");
+    try {
+      if (typeof navigator.share === "function") {
+        try {
+          await navigator.share(PUBLIC_SHARE);
+          return;
+        } catch (error) {
+          if (error instanceof DOMException && error.name === "AbortError") return;
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(PUBLIC_SHARE.url);
+        setShareMessage("링크를 복사했습니다. 원하는 곳에 붙여넣어 공유하세요.");
+      } catch {
+        openDialog("share");
+      }
+    } finally {
+      sharePending.current = false;
+    }
   }
 
   return (
@@ -279,6 +311,7 @@ export default function PublicDemo() {
           >
             <Icon name="sun" />
           </button>
+          <ShareButton className="site-share-button header-share" onClick={sharePage} />
           <a href="#guide" className="check-button">
             내 상황 선택하기 <span aria-hidden="true">→</span>
           </a>
@@ -580,9 +613,10 @@ export default function PublicDemo() {
             확정하거나 신고를 접수하지 않습니다.
           </p>
           <p>
-            개인정보를 입력받거나 메시지를 전송·저장하지 않는 공개 데모입니다.
+            개인정보·의심 메시지를 입력받거나 분석·저장하지 않는 공개 데모입니다.
             주민등록번호·계좌번호·비밀번호·인증번호를 입력하지 마세요.
           </p>
+          <ShareButton className="site-share-button footer-share" onClick={sharePage} />
           <button type="button" onClick={() => openDialog("about")}>
             K-SAFE 소개 · 개인정보 보호 안내
           </button>
@@ -606,20 +640,30 @@ export default function PublicDemo() {
           <Icon name="question" />
           <span>도움받기</span>
         </a>
+        <ShareButton onClick={sharePage} />
         <button type="button" onClick={() => openDialog("about")}>
           <Icon name="more" />
           <span>더보기</span>
         </button>
       </nav>
+      {shareMessage && (
+        <div className="share-feedback" role="status">
+          <Icon name="link" />
+          <p>{shareMessage}</p>
+          <button className="icon-button" type="button" aria-label="공유 알림 닫기" onClick={() => setShareMessage("")}>×</button>
+        </div>
+      )}
       <dialog
         ref={dialog}
         className="info-dialog"
         aria-labelledby="dialog-title"
       >
         <div className="dialog-top">
-          <Icon name={dialogKind === "bank" ? "bank" : "shield"} />
+          {dialogKind === "share" ? <ShareIcon /> : <Icon name={dialogKind === "bank" ? "bank" : "shield"} />}
           <h2 id="dialog-title">
-            {dialogKind === "bank"
+            {dialogKind === "share"
+              ? "링크 복사해서 공유하기"
+              : dialogKind === "bank"
               ? "금융회사 연락 방법"
               : "K-SAFE 국민안심 AI"}
           </h2>
@@ -632,7 +676,18 @@ export default function PublicDemo() {
             ×
           </button>
         </div>
-        {dialogKind === "bank" ? (
+        {dialogKind === "share" ? (
+          <>
+            <p>자동으로 복사하지 못했습니다. 아래 주소를 길게 누르거나 선택해 복사한 뒤, 원하는 곳에 붙여넣어 주세요.</p>
+            <p className="share-copy-link" tabIndex={0} onFocus={(event) => {
+              const range = document.createRange();
+              range.selectNodeContents(event.currentTarget);
+              const selection = window.getSelection();
+              selection?.removeAllRanges();
+              selection?.addRange(range);
+            }}>{PUBLIC_SHARE.url}</p>
+          </>
+        ) : dialogKind === "bank" ? (
           <>
             <p>
               의심 앱을 설치했다면 다른 안전한 전화·기기로 확인하세요.
@@ -665,7 +720,7 @@ export default function PublicDemo() {
             </p>
             <h3>개인정보 보호</h3>
             <p>
-              입력창, 메시지 전송, 분석 요청, 개인정보 저장 기능을 사용하지
+              개인정보·의심 메시지의 입력, 분석 요청, 저장 기능을 사용하지
               않습니다. 주민등록번호·계좌번호·비밀번호·인증번호를 입력하지
               마세요.
             </p>
@@ -685,6 +740,26 @@ export default function PublicDemo() {
         </button>
       </dialog>
     </div>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <path d="m8.6 10.5 6.8-4m-6.8 7 6.8 4" />
+    </svg>
+  );
+}
+
+function ShareButton({ onClick, className = "" }: { onClick: () => void; className?: string }) {
+  return (
+    <button type="button" className={className} aria-label="공유하기" title="공유하기" onClick={onClick}>
+      <ShareIcon />
+      <span>공유하기</span>
+    </button>
   );
 }
 

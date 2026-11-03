@@ -2651,3 +2651,71 @@ p {
   .public-site .information-app { gap: 8px; padding: 12px; }
   .public-site .follow-up-icon { width: 30px; height: 30px; border-radius: 8px; }
 }
+
+/* Share controls: native share sheet with a copy-link fallback. */
+.public-site .site-share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #c4d4ef;
+  border-radius: 12px;
+  background: #f4f8ff;
+  color: #194490;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.public-site .site-share-button .icon { flex: none; width: 19px; height: 19px; }
+.public-site .footer-share { margin: 8px 0; }
+.public-site .site-share-button:hover { background: #eaf1ff; border-color: #8daadd; }
+.public-site .site-share-button:focus-visible,
+.public-site .share-copy-link:focus-visible { outline: 3px solid #1e4cd6; outline-offset: 3px; }
+.public-site .share-feedback {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 10px 10px 10px 16px;
+  border: 1px solid #b9cee9;
+  border-radius: 14px;
+  background: #fff;
+  color: #243958;
+  box-shadow: 0 6px 28px #172b4526;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.public-site .share-feedback > .icon { flex: none; width: 22px; height: 22px; color: #194490; }
+.public-site .share-feedback p { min-width: 0; margin: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.public-site .share-copy-link {
+  padding: 14px;
+  border: 1px solid #c4d4ef;
+  border-radius: 12px;
+  background: #f4f8ff;
+  color: #194490;
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
+.public-site.high-contrast .site-share-button,
+.public-site.high-contrast .share-feedback,
+.public-site.high-contrast .share-copy-link { border: 2px solid #344565; background: #fff; color: #18233c; }
+.public-site.large-text .site-share-button,
+.public-site.large-text .share-feedback { font-size: 18px; }
+@media (min-width: 769px) and (max-width: 1399px) {
+  .public-site .header-share { width: 44px; padding: 10px; }
+  .public-site .header-share > span { display: none; }
+}
+@media (max-width: 768px) {
+  .public-site .bottom-nav > a, .public-site .bottom-nav > button { flex: 1; min-width: 44px; padding: 4px 0; }
+  .public-site .share-feedback { left: 16px; right: 16px; bottom: calc(80px + env(safe-area-inset-bottom)); max-width: none; }
+}
