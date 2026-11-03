@@ -608,19 +608,23 @@ export default function PublicDemo() {
           </details>
         </div>
         <footer className="site-footer">
-          <p>
-            <strong>가상 사례 시연 · 실제 AI 분석 아님</strong> · 사기 여부를
-            확정하거나 신고를 접수하지 않습니다.
-          </p>
-          <p>
-            개인정보·의심 메시지를 입력받거나 분석·저장하지 않는 공개 데모입니다.
-            주민등록번호·계좌번호·비밀번호·인증번호를 입력하지 마세요.
-          </p>
-          <ShareButton className="site-share-button footer-share" onClick={sharePage} />
-          <button type="button" onClick={() => openDialog("about")}>
-            K-SAFE 소개 · 개인정보 보호 안내
-          </button>
-          <span>© 2026 K-SAFE 국민안심 AI</span>
+          <div className="footer-notices">
+            <p>
+              <strong>가상 사례 시연 · 실제 AI 분석 아님</strong> · 사기 여부를
+              확정하거나 신고를 접수하지 않습니다.
+            </p>
+            <p>
+              개인정보·의심 메시지를 입력받거나 분석·저장하지 않는 공개 데모입니다.
+              주민등록번호·계좌번호·비밀번호·인증번호를 입력하지 마세요.
+            </p>
+          </div>
+          <div className="footer-actions">
+            <ShareButton className="site-share-button footer-share" onClick={sharePage} />
+            <button className="footer-about" type="button" onClick={() => openDialog("about")}>
+              K-SAFE 소개 · 개인정보 보호 안내
+            </button>
+          </div>
+          <p className="footer-copyright">© 2026 K-SAFE 국민안심 AI</p>
         </footer>
       </main>
       <nav className="bottom-nav" aria-label="하단 메뉴">

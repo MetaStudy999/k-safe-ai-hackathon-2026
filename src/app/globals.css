@@ -2719,3 +2719,52 @@ p {
   .public-site .bottom-nav > a, .public-site .bottom-nav > button { flex: 1; min-width: 44px; padding: 4px 0; }
   .public-site .share-feedback { left: 16px; right: 16px; bottom: calc(80px + env(safe-area-inset-bottom)); max-width: none; }
 }
+
+/* Keep footer actions separate from notices and copyright at every width. */
+.public-site .site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 28px 28px;
+  border-top: 1px solid #dfe8f5;
+  text-align: center;
+}
+.public-site .footer-notices { max-width: 960px; line-height: 1.8; word-break: keep-all; overflow-wrap: anywhere; }
+.public-site .footer-notices p + p { margin-top: 8px; }
+.public-site .footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  width: 100%;
+}
+.public-site .site-footer .footer-share { margin: 0; min-height: 46px; padding: 10px 18px; }
+.public-site .footer-about {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #315898;
+  line-height: 1.6;
+  white-space: normal;
+  word-break: keep-all;
+}
+.public-site .footer-about:hover { background: #eaf1ff; }
+.public-site .footer-about:focus-visible { outline: 3px solid #1e4cd6; outline-offset: 3px; }
+.public-site .footer-copyright { font-size: 13px; color: #526180; text-align: center; }
+.public-site.high-contrast .site-footer { border-color: #344565; }
+.public-site.high-contrast .footer-about,
+.public-site.high-contrast .footer-copyright { color: #18233c; }
+.public-site.large-text .footer-about { font-size: 18px; }
+@media (max-width: 768px) {
+  .public-site .site-footer { align-items: stretch; gap: 16px; padding: 22px 16px 28px; text-align: left; }
+  .public-site .footer-actions { flex-direction: column; align-items: stretch; gap: 10px; }
+  .public-site .site-footer .footer-share { width: 100%; }
+  .public-site .footer-about { width: 100%; padding: 10px 12px; border: 1px solid #dfe6ef; background: #fff; }
+  .public-site.high-contrast .footer-about { border: 2px solid #344565; }
+}
