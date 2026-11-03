@@ -2,75 +2,81 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type SpeechStatus = "idle" | "loading" | "playing" | "finished" | "stopped" | "unsupported" | "error";
+export const BEFORE_TRANSFER_AUDIO = "/audio/before-transfer-ko-sunhi-v1-20261104.mp3";
+type SpeechStatus = "idle" | "loading" | "playing" | "finished" | "stopped" | "error";
 
 export function useGuideSpeech() {
   const [status, setStatus] = useState<SpeechStatus>("idle");
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const startTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const cancel = useCallback(() => {
-    const utterance = utteranceRef.current;
-    // Ignore delayed events from an utterance that was stopped or replaced.
-    utteranceRef.current = null;
+  const clearTimer = useCallback(() => {
     if (startTimer.current !== null) clearTimeout(startTimer.current);
     startTimer.current = null;
-    if (utterance) window.speechSynthesis.cancel();
   }, []);
+
+  const cancel = useCallback(() => {
+    const audio = audioRef.current;
+    // Invalidate before pausing: old events and play() rejections must be ignored.
+    audioRef.current = null;
+    clearTimer();
+    if (audio) {
+      audio.onplaying = audio.onwaiting = audio.onpause = audio.onended = audio.onerror = null;
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    }
+  }, [clearTimer]);
 
   const stop = useCallback(() => {
     cancel();
     setStatus("stopped");
   }, [cancel]);
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback(() => {
     cancel();
-    if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
-      setStatus("unsupported");
-      return;
-    }
-
     try {
-      const synthesis = window.speechSynthesis;
-      const utterance = new SpeechSynthesisUtterance(text);
-      const koreanVoices = synthesis.getVoices().filter((voice) => /^ko(?:[-_]|$)/i.test(voice.lang));
-      const voice = koreanVoices.find((voice) => voice.localService) ?? koreanVoices[0];
-      if (voice) utterance.voice = voice;
-      // The browser can still select Korean when its voice list has not loaded yet.
-      utterance.lang = "ko-KR";
-      utterance.rate = 0.95;
-      utteranceRef.current = utterance;
-      setStatus("loading");
-      utterance.onstart = () => {
-        if (utteranceRef.current !== utterance) return;
-        if (startTimer.current !== null) clearTimeout(startTimer.current);
-        startTimer.current = null;
+      // A fresh element starts at zero and cannot inherit events from a previous run.
+      const audio = new Audio(BEFORE_TRANSFER_AUDIO);
+      audioRef.current = audio;
+      const current = () => audioRef.current === audio;
+      const fail = () => {
+        if (!current()) return;
+        cancel();
+        setStatus("error");
+      };
+      const loading = () => {
+        if (!current()) return;
+        clearTimer();
+        setStatus("loading");
+        startTimer.current = setTimeout(fail, 15000);
+      };
+      audio.onplaying = () => {
+        if (!current()) return;
+        clearTimer();
         setStatus("playing");
       };
-      utterance.onend = () => {
-        if (utteranceRef.current !== utterance) return;
-        utteranceRef.current = null;
-        if (startTimer.current !== null) clearTimeout(startTimer.current);
-        startTimer.current = null;
+      audio.onwaiting = loading;
+      audio.onpause = () => {
+        if (!current() || audio.ended) return;
+        clearTimer();
+        setStatus("stopped");
+      };
+      audio.onended = () => {
+        if (!current()) return;
+        clearTimer();
         setStatus("finished");
       };
-      utterance.onerror = () => {
-        if (utteranceRef.current !== utterance) return;
-        cancel();
-        setStatus("error");
-      };
-      startTimer.current = setTimeout(() => {
-        if (utteranceRef.current !== utterance) return;
-        cancel();
-        setStatus("error");
-      }, 8000);
-      // Start directly in the user's click, including on mobile browsers.
-      synthesis.speak(utterance);
+      audio.onerror = fail;
+      loading();
+      // Call synchronously in the user's click/keyboard activation for mobile playback.
+      // Never fall back to browser speech synthesis on failure.
+      void audio.play().catch(fail);
     } catch {
       cancel();
       setStatus("error");
     }
-  }, [cancel]);
+  }, [cancel, clearTimer]);
 
   useEffect(() => {
     const onHidden = () => {
@@ -78,8 +84,6 @@ export function useGuideSpeech() {
     };
     document.addEventListener("visibilitychange", onHidden);
     window.addEventListener("pagehide", stop);
-    // Prime asynchronously loaded voice lists before the first selection.
-    if ("speechSynthesis" in window) window.speechSynthesis.getVoices();
     return () => {
       document.removeEventListener("visibilitychange", onHidden);
       window.removeEventListener("pagehide", stop);
