@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Brand from "./brand";
+import { useGuideSpeech } from "./use-guide-speech";
 import {
   PUBLIC_DEMO_SCENARIOS,
   LINK_FOLLOW_UPS,
@@ -212,6 +213,21 @@ const PUBLIC_SHARE = {
   url: "https://k-safe-ai-hackathon-2026.vercel.app/",
 };
 
+const BEFORE_TRANSFER_SPEECH = [
+  "송금 전 안전 안내입니다.",
+  ...getPublicDemoActions("before_transfer"),
+].join(" ").replace(/\b(112|118|1394)\b/g, (number) => number.split("").join(" "));
+
+const speechMessages = {
+  idle: "송금 전을 선택하면 안내 음성이 재생됩니다.",
+  loading: "안내 음성을 준비하고 있습니다.",
+  playing: "송금 전 안내 음성을 재생하고 있습니다.",
+  finished: "안내 음성이 끝났습니다. 다시 들을 수 있습니다.",
+  stopped: "음성 안내를 중지했습니다.",
+  unsupported: "이 브라우저는 음성 안내를 지원하지 않습니다. 아래 글 안내를 확인해 주세요.",
+  error: "음성을 재생하지 못했습니다. 기기의 소리 설정을 확인한 뒤 다시 듣기를 누르거나 아래 글 안내를 확인해 주세요.",
+};
+
 export default function PublicDemo() {
   const [{ situation, useSafePhone }, setNavigation] = useState<PublicDemoNavigation>({ situation: "unsure", useSafePhone: false });
   const [hasSelected, setHasSelected] = useState(false);
@@ -226,6 +242,8 @@ export default function PublicDemo() {
   const current = PUBLIC_DEMO_SCENARIOS.find((item) => item.id === situation)!;
   const actions = getPublicDemoActions(situation);
   const precautions = getPublicDemoPrecautions(situation);
+  const speech = useGuideSpeech();
+  const speechActive = speech.status === "loading" || speech.status === "playing";
 
   function scrollToSituationOnMobile() {
     if (!window.matchMedia("(max-width: 768px)").matches) return;
@@ -239,6 +257,7 @@ export default function PublicDemo() {
   }
 
   function changeSituation(next: PublicDemoSituation, focus = true) {
+    if (next !== "before_transfer") speech.stop();
     setHasSelected(true);
     setNavigation((previous) => getPublicDemoNavigation(previous, next));
     if (focus) situationGroup.current?.querySelector<HTMLInputElement>(`input[value="${next}"]`)?.focus();
@@ -402,13 +421,24 @@ export default function PublicDemo() {
                     value={option.id}
                     checked={hasSelected && situation === option.id}
                     onChange={() => changeSituation(option.id, false)}
-                    onClick={scrollToSituationOnMobile}
+                    onClick={() => {
+                      if (option.id === "before_transfer") speech.speak(BEFORE_TRANSFER_SPEECH);
+                      scrollToSituationOnMobile();
+                    }}
                   />
                   <span className="situation-icon">
                     <Icon name={option.icon} />
                   </span>
                   <span className="situation-text">
-                    <strong>{option.label}</strong>
+                    <strong>
+                      {option.label}
+                      {option.id === "before_transfer" && (
+                        <span className="situation-voice-hint">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m11 4-6 5H2v6h3l6 5V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" /></svg>
+                          <span className="visuallyHidden"> · 선택하면 음성 안내</span>
+                        </span>
+                      )}
+                    </strong>
                     <span>{option.detail}</span>
                   </span>
                   <span className="card-arrow">
@@ -429,6 +459,15 @@ export default function PublicDemo() {
                 <h2 id="emergency-title">{hasSelected ? current.alertTitle : "이미 돈을 보냈다면"}</h2>
                 <strong>{hasSelected ? current.alertText : "즉시 112 또는 금융회사에 연락해 지급정지를 요청하세요."}</strong>
                 {useSafePhone && <p>의심되는 휴대폰에서는 전화하거나 비밀번호를 변경하지 마세요. 다른 안전한 전화를 사용하세요.</p>}
+                {hasSelected && situation === "before_transfer" && (
+                  <div className="guide-speech" role="group" aria-label="송금 전 음성 안내">
+                    <div className="guide-speech-buttons">
+                      <button type="button" onClick={() => speech.speak(BEFORE_TRANSFER_SPEECH)} disabled={speech.status === "unsupported"}>안내 음성 다시 듣기</button>
+                      <button type="button" onClick={speech.stop} disabled={!speechActive}>음성 중지</button>
+                    </div>
+                    <p role="status" aria-live="polite" aria-atomic="true">{speechMessages[speech.status]}</p>
+                  </div>
+                )}
               </div>
             </div>
             <ContactButtons onBank={() => openDialog("bank")} safePhoneOnly={useSafePhone} />
