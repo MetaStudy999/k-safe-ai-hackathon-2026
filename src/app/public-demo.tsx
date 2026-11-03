@@ -219,6 +219,17 @@ export default function PublicDemo() {
   const actions = getPublicDemoActions(situation);
   const precautions = getPublicDemoPrecautions(situation);
 
+  function scrollToActionsOnMobile() {
+    if (!window.matchMedia("(max-width: 768px)").matches) return;
+    // Let the selected situation's guidance render before scrolling to it.
+    window.requestAnimationFrame(() => {
+      document.getElementById("rules")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "start",
+      });
+    });
+  }
+
   function changeSituation(next: PublicDemoSituation, focus = true) {
     setHasSelected(true);
     setNavigation((previous) => getPublicDemoNavigation(previous, next));
@@ -358,6 +369,7 @@ export default function PublicDemo() {
                     value={option.id}
                     checked={hasSelected && situation === option.id}
                     onChange={() => changeSituation(option.id, false)}
+                    onClick={scrollToActionsOnMobile}
                   />
                   <span className="situation-icon">
                     <Icon name={option.icon} />
