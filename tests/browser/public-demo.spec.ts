@@ -365,7 +365,7 @@ test("mobile menu, bottom navigation, dialog focus and telephone click dispatch"
   for (const [name, hash] of [
     ["사례보기", "cases"],
     ["안전수칙", "rules"],
-    ["도움받기", "help"],
+    ["긴급전화", "help"],
     ["홈", "home"],
   ]) {
     await page
