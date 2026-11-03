@@ -213,18 +213,12 @@ const PUBLIC_SHARE = {
   url: "https://k-safe-ai-hackathon-2026.vercel.app/",
 };
 
-const BEFORE_TRANSFER_SPEECH = [
-  "송금 전 안전 안내입니다.",
-  ...getPublicDemoActions("before_transfer"),
-].join(" ").replace(/\b(112|118|1394)\b/g, (number) => number.split("").join(" "));
-
 const speechMessages = {
   idle: "송금 전을 선택하면 안내 음성이 재생됩니다.",
   loading: "안내 음성을 준비하고 있습니다.",
   playing: "송금 전 안내 음성을 재생하고 있습니다.",
   finished: "안내 음성이 끝났습니다. 다시 들을 수 있습니다.",
   stopped: "음성 안내를 중지했습니다.",
-  unsupported: "이 브라우저는 음성 안내를 지원하지 않습니다. 아래 글 안내를 확인해 주세요.",
   error: "음성을 재생하지 못했습니다. 기기의 소리 설정을 확인한 뒤 다시 듣기를 누르거나 아래 글 안내를 확인해 주세요.",
 };
 
@@ -422,7 +416,7 @@ export default function PublicDemo() {
                     checked={hasSelected && situation === option.id}
                     onChange={() => changeSituation(option.id, false)}
                     onClick={() => {
-                      if (option.id === "before_transfer") speech.speak(BEFORE_TRANSFER_SPEECH);
+                      if (option.id === "before_transfer") speech.speak();
                       scrollToSituationOnMobile();
                     }}
                   />
@@ -462,10 +456,11 @@ export default function PublicDemo() {
                 {hasSelected && situation === "before_transfer" && (
                   <div className="guide-speech" role="group" aria-label="송금 전 음성 안내">
                     <div className="guide-speech-buttons">
-                      <button type="button" onClick={() => speech.speak(BEFORE_TRANSFER_SPEECH)} disabled={speech.status === "unsupported"}>안내 음성 다시 듣기</button>
+                      <button type="button" onClick={() => speech.speak()}>안내 음성 다시 듣기</button>
                       <button type="button" onClick={speech.stop} disabled={!speechActive}>음성 중지</button>
                     </div>
                     <p role="status" aria-live="polite" aria-atomic="true">{speechMessages[speech.status]}</p>
+                    <p>AI가 만든 한국어 안내 음성입니다.</p>
                   </div>
                 )}
               </div>

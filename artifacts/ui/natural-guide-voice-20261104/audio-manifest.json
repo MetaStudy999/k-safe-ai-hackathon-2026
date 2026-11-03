@@ -1,0 +1,21 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "-5%",
+  "generator": "edge-tts",
+  "generation_date": "2026-11-04",
+  "generation_count": 1,
+  "asset": "public/audio/before-transfer-ko-sunhi-v1-20261104.mp3",
+  "bytes": 136224,
+  "sha256": "eb4d21f876849edc7bc613d15b4881c52bd3603541008bd8747ba0a83bffaed2",
+  "source_guidance": "src/lib/public-demo.ts getPublicDemoActions(\"before_transfer\")",
+  "phone_pronunciations": {
+    "1394": "일 삼 구 사",
+    "118": "일 일 팔"
+  },
+  "audible_listening_performed": false,
+  "notes": "No impersonation sample narration, real-person cloning, paid API, key or plan changes. Browser decode/duration evidence recorded separately.",
+  "duration_seconds": 22.704,
+  "format": "MP3, audio/mpeg",
+  "subtitle_file": "narration.srt",
+  "generator_version": "7.3.1"
+}
