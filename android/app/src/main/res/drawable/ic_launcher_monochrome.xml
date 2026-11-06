@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Preserve the brand shield outline as an alpha mask for themed launcher icons. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:translateX="31" android:translateY="27"
+        android:scaleX="1.28" android:scaleY="1.28">
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+            android:pathData="M18,1c5,5 10,6 16,7v15c0,9 -9,15 -16,19C11,38 2,32 2,23V8c6,-1 11,-2 16,-7Z M18,10c3,2 6,3 9,4v9c0,5 -5,9 -9,12c-4,-3 -9,-7 -9,-12v-9c3,-1 6,-2 9,-4Z" />
+    </group>
+</vector>

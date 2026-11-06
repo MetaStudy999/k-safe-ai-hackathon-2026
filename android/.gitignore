@@ -1,0 +1,18 @@
+# Per-machine SDK, caches and generated output
+.gradle/
+.build-env/
+**/build/
+local.properties
+verification/
+.idea/
+*.iml
+
+# Installable packages and signing material
+*.apk
+*.aab
+*.jks
+*.keystore
+*.key
+*.pem
+*.p12
+*.pfx
