@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Geometry and colors copied from existing src/app/brand.tsx, without editing it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="36dp" android:height="42dp"
+    android:viewportWidth="36" android:viewportHeight="42">
+    <path android:pathData="M18,1c5,5 10,6 16,7v15c0,9 -9,15 -16,19C11,38 2,32 2,23V8c6,-1 11,-2 16,-7Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:startX="0" android:startY="0" android:endX="36" android:endY="0" android:type="linear">
+                <item android:offset="0" android:color="#45BAFF" />
+                <item android:offset="1" android:color="#1547FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#FFFFFF" android:pathData="M18,10c3,2 6,3 9,4v9c0,5 -5,9 -9,12c-4,-3 -9,-7 -9,-12v-9c3,-1 6,-2 9,-4Z" />
+    <path android:fillColor="#D2EFFF" android:pathData="M18,10v25c-4,-3 -9,-7 -9,-12v-9c3,-1 6,-2 9,-4Z" />
+</vector>

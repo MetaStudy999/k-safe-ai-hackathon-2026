@@ -1,0 +1,62 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'kr.ksafe.hisecurity'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+        applicationId 'kr.ksafe.hisecurity.dev'
+        minSdk 26
+        targetSdk 35
+        versionCode 20003
+        versionName '2.0.0-dev.p4'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    lint {
+        abortOnError true
+        warningsAsErrors true
+        disable 'GradleDependency', 'AndroidGradlePluginVersion', 'OldTargetApi'
+    }
+}
+
+// Runs the production URL policy itself on a plain JVM; no JUnit/AndroidX download.
+tasks.register('policyTest', JavaExec) {
+    dependsOn 'compilePolicyTests'
+    classpath = files(layout.buildDirectory.dir('policy-tests'))
+    mainClass = 'kr.ksafe.hisecurity.NavigationPolicyTest'
+}
+tasks.register('compilePolicyTests', JavaCompile) {
+    source = files('src/main/java/kr/ksafe/hisecurity/NavigationPolicy.java',
+            'src/test/java/kr/ksafe/hisecurity/NavigationPolicyTest.java')
+    classpath = files()
+    destinationDirectory = layout.buildDirectory.dir('policy-tests')
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+// Compile/run only the pure Java matcher and its fixtures; no test libraries required.
+tasks.register('wakewordMatcherTest', JavaExec) {
+    dependsOn 'compileWakewordMatcherTests'
+    classpath = files(layout.buildDirectory.dir('wakeword-matcher-tests'))
+    mainClass = 'kr.ksafe.hisecurity.WakewordMatcherTest'
+}
+tasks.register('compileWakewordMatcherTests', JavaCompile) {
+    source = files('src/main/java/kr/ksafe/hisecurity/WakewordMatcher.java',
+            'src/test/java/kr/ksafe/hisecurity/WakewordMatcherTest.java')
+    classpath = files()
+    destinationDirectory = layout.buildDirectory.dir('wakeword-matcher-tests')
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+    options.encoding = 'UTF-8'
+}
+tasks.named('check').configure { dependsOn 'policyTest', 'wakewordMatcherTest' }
